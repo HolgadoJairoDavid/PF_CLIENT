@@ -17,7 +17,7 @@ onMounted(async () => {
     router.push({ name: 'login' })
   }
 
-  const response = await fetch("http://localhost:3001/payment/all-donations", {
+  const response = await fetch("https://pfapi-production.up.railway.app/payment/all-donations", {
     method: "GET"
   });
 
@@ -38,7 +38,7 @@ const payPal = async (formData) => {
     ...formData,
   }
 
-  const response = await fetch("http://localhost:3001/payment/create-order", {
+  const response = await fetch("https://pfapi-production.up.railway.app/payment/create-order", {
     method: "POST",
     headers: {
       'Content-Type': 'application/json;charset=utf-8'

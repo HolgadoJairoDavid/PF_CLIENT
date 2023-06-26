@@ -13,9 +13,8 @@ const route = useRoute();
 
 /* ! ////////////// */
 
-const API_BASE_URL = 'http://localhost:5001'
 
-  // const SOCKET_URL = 'http://localhost:5001'
+  
   // const socket = io(SOCKET_URL)
 
   const rooms = ref([])
@@ -45,7 +44,6 @@ const API_BASE_URL = 'http://localhost:5001'
   }
 
   provide('chat-context', {
-    API_BASE_URL,
     // socket,
     rooms,
     setRooms,
