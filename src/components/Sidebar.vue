@@ -82,7 +82,7 @@
 
   const getRooms = async () => {
     const response = await fetch(
-      'https://pfapi-production.up.railway.app/chat/rooms',
+      'https://henrymoonapi.onrender.com/chat/rooms',
       {
         method: "GET",
         headers: {"Content-type": "application/json;charset=UTF-8"}
