@@ -36,5 +36,8 @@ export default {
   },
   unBanUser(id){
     return api.post(`/user/revive/${id}`)
+  },
+  paypal(data){
+    return api.post('/payment/create-order', data)
   }
 };

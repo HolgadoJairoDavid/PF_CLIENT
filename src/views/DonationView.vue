@@ -6,6 +6,7 @@ import { onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { ref } from "vue";
 import Donation from "../components/Donation.vue";
+import ClienteService from "../services/ClienteService";
 
 const store = useAccessStore()
 const router = useRouter()
@@ -38,15 +39,7 @@ const payPal = async (formData) => {
     ...formData,
   }
 
-  const response = await fetch("https://pfapi-production.up.railway.app/payment/create-order", {
-    method: "POST",
-    headers: {
-      'Content-Type': 'application/json;charset=utf-8'
-    },
-    body: JSON.stringify(paymentInfo)
-  });
-
-  const data = await response.json();
+  const {data} = await ClienteService.paypal(paymentInfo)
 
   window.location.href = data.links[1].href;
 };
