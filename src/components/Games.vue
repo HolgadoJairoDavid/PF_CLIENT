@@ -87,7 +87,7 @@ const setPages = () => {
   <div class="flex flex-row justify-evenly flex-wrap  md:flex-row">    
     <div v-for="game in displayedGames" :key="game._id" class="container">
       <p>{{ game.name }}</p>
-      <img :src="`../src/assets/img/${game.image}`" alt="" class="w-full h-3/4 object-cover" />
+      <img :src="game.image" alt="" class="w-full h-3/4 object-cover" />
       
       <div class="container-button">
         <button class="button-play" @click="openGame(game._id)">PLAY</button>
