@@ -32,11 +32,11 @@ span {
   position: relative;
   width: 2rem;
   height: 2rem;
-  background: #4fc3dc;
+  background: var(--title);
   margin: 0 4px;
   border-radius: 50%;
   opacity: 0;
-  box-shadow: 0 0 0 10px #4fc3dc44, 0 0 50px #4fc3dc, 0 0 100px #4fc3dc;
+  box-shadow: 0 0 0 10px var(--title)44, 0 0 50px var(--title), 0 0 100px var(--container);
   animation: bubbles 15s linear infinite;
   animation-duration: calc(125s / var(--i));
 
@@ -53,8 +53,8 @@ span {
   }
 }
 span:nth-child(even) {
-  background-color: #ff2d75;
-  box-shadow: 0 0 0 10px #ff2d7544, 0 0 50px #ff2d75, 0 0 100px #ff2d75;
+  background-color: var(--details);
+  box-shadow: 0 0 0 10px var(--container), 0 0 50px var(--details), 0 0 100px var(--details);
 }
 @media (max-width: 1200px) {
   span {

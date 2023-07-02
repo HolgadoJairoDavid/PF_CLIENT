@@ -1,114 +1,134 @@
 <script setup>
-import { useAccessStore} from "../stores/userStore";
+import { useRouter } from "vue-router";
+import { useGames } from "../stores/gameStore";
+import { onMounted, ref, watch, computed } from 'vue';
+import ClienteService from '../services/ClienteService';
+import { useAccessStore } from "./../stores/userStore";
+
+const userStore = useAccessStore()
+const storeGame = useGames()
+const router = useRouter()
+const games = ref([])
 
 
-const store = useAccessStore();
+const openGame = async (name) => {
+  const gameToStore = games.value.find(game => game._id === name)
+  storeGame.uploadGame(gameToStore)
+  if(!gameToStore.isOwn) {
+    const {data: ranking} = await ClienteService.countRankingThird({
+      userID: userStore.user._id,
+      gameID: name,
+      cohort: userStore.user.cohort,
+      group: userStore.user.group,
+      isOwn: gameToStore.isOwn,
+    })
+    console.log(ranking)
+  }
+  router.push(`/game/${name}`)
+}
 
-const openSlimes = () => {
-  const popUp = window.open("", "Slimes", "width=800,height=600");
-  popUp.document.write(`
-        <html>
-        <head>
-          <title>SLIMES</title>
-          <style>
-            body { margin: 0; background-color:black; text-align: center }
-            iframe { width: 100%; height: 100%; border: none; }
-          </style>
-        </head>
-        <body>
-            <h1>SLIMES GAME</h1>
-          <iframe allowfullscreen src="https://slimes.onrender.com/?email=${store.user.email}"></iframe>
-        </body>
-        </html>
-      `);
-};
-const openMemes = () => {
-  const popUp = window.open("", "Memes", "width=800,height=600");
-  popUp.document.write(`
-        <html>
-        <head>
-          <title>MEMES</title>
-          <style>
-            body { margin: 0; background-color:black; text-align: center }
-            iframe { width: 100%; height: 100%; border: none; }
-          </style>
-        </head>
-        <body>
-  
-          <iframe allowfullscreen src="https://makeitmeme.com/es/"></iframe>
-        </body>
-        </html>
-      `);
-};
+// Acá brindaremos el método para cargar el store del juego y 
+// el router push
+
+const openDetailGame = (gameName) => {
+  const gameToStore = games.value.find(game => game.name === gameName)
+  storeGame.uploadGame(gameToStore)
+  router.push({ name: 'detailGame' })
+
+}
+
+onMounted(async () => {
+  const { data } = await ClienteService.getAllGames()
+  games.value = data
+  storeGame.uploadGames(data)
+  setPages()
+});
+
+// Aqui empieza la logica del Paginado
+const currentGames = ref(storeGame.games);
+const page = ref(1);
+const gamesPerPage = 4;
+const pages = ref([]);
+
+watch(storeGame.games, () => {
+  currentGames.value = storeGame.games;
+  setPages();
+});
+
+const displayedGames = computed(() => {
+  const from = (page.value - 1) * gamesPerPage;
+  const to = page.value * gamesPerPage;
+  return storeGame.games.slice(from, to);
+})
+
+const previusPage = () => {
+ if(page.value > 1) {
+   page.value--;
+ }
+}
+
+const nextPage = () => {
+ if(page.value < pages.value.length) {
+   page.value++;
+ }
+}
+
+const setPages = () => {
+  pages.value = Array.from({length: Math.ceil(storeGame.games.length / gamesPerPage)}, (_, index) => index + 1);
+}
+
+// Acá brindaremos el método para cargar el store del juego y
+// el router push
 </script>
 
 <template>
-  <div class="flex flex-col justify-between flex-wrap md:flex-row p-3 m-3">
-    <button
-      class="text-black text-center font-bold uppercase rounded-lg"
-      @click="openSlimes"
-    >
-      <div class="container">
-        <p>SLIMES</p>
-        <img
-          src="../assets/img/slimes.svg"
-          class="w-full h-3/4 object-cover"
-          alt=""
-        />
-      </div>
-    </button>
-    <button
-      class="text-black text-center font-bold uppercase rounded-lg"
-      @click="openMemes"
-    >
-      <div class="container">
-        <p>MEME GENERATOR</p>
-        <img
-          src="../assets/img/memegenerator.svg"
-          class="w-full h-3/4 object-cover"
-          alt=""
-        />
-      </div>
-    </button>
 
-    <div>
-      <div class="container">
-        <p>BOMB PARTY</p>
-        <img
-          src="../assets/img/bombparty.svg"
-          class="w-full h-3/4 object-cover"
-          alt=""
-        />
-      </div>
-      <div class="container">
-        <p>SNAKE</p>
-        <img
-          src="../assets/img/snake.svg"
-          class="w-full h-3/4 object-cover"
-          alt=""
-        />
+<div class=" flex flex-col">
+  <div class="flex flex-row justify-evenly flex-wrap  md:flex-row">    
+    <div v-for="game in displayedGames" :key="game._id" class="container">
+      <p>{{ game.name }}</p>
+      <img :src="`../src/assets/img/${game.image}`" alt="" class="w-full h-3/4 object-cover" />
+      
+      <div class="container-button">
+        <button class="button-play" @click="openGame(game._id)">PLAY</button>
+        <button class="button-detail" @click="openDetailGame(game.name)">DETAIL</button>
       </div>
     </div>
-
-    <div>
-      <div class="container">
-        <p>FLAPPY BIRD</p>
-        <img
-          src="../assets/img/flappybird.svg"
-          class="w-full h-3/4 object-cover"
-          alt=""
-        />
-      </div>
-      <div class="container">
-        <p>GARTHIC PHONE</p>
-        <img
-          src="../assets/img/garthicphone.svg"
-          class="w-full h-3/4 object-cover"
-          alt=""
-        />
-      </div>
-    </div>
+    
   </div>
+
+  <div class="flex flex-row w-full space-x-4 justify-center">
+        <button
+          type="button"
+          class="bg-yellow-300 w-[80px] p-3 m-3 rounded-md text-black font-bold hover:bg-gray-800 hover:text-white"
+          @click="previusPage"
+          :disabled="page === 1"
+        >
+          Prev
+        </button>
+
+          <button
+            type="button"
+            v-for="pageNumber in pages"
+            @click="page = pageNumber"
+            :key="pageNumber"
+            :class="['bg-yellow-300 p-2 m-2 w-10 rounded-md text-black font-bold hover:bg-gray-800 hover:text-white', { 'text-white bg-yellow-700': page === pageNumber }]"
+          >
+            {{ pageNumber }}
+          </button>
+
+        <button
+          type="button"
+          @click="nextPage"
+          :disabled="page === pages.length"
+          class="bg-yellow-300 p-2 m-2 w-[80px] rounded-md text-black font-bold hover:bg-gray-800 hover:text-white"
+        >
+          Next
+        </button>
+      </div>
+</div>
+  
+  
 </template>
 
 <style lang="scss" scoped>
@@ -119,45 +139,61 @@ const openMemes = () => {
 }
 
 .container {
-  width: 250px;
-  height: 180px;
-  animation: glow 1s ease-in-out infinite alternate;
+  width: 400px;
+  height: fit-content;
   padding: 5px;
   margin: 10px;
   text-align: center;
-  text-shadow: #f2e500 5px;
+  border: #f2e500 solid 2px;
   color: white;
   font-size: large;
-  cursor: pointer;
-}
-
-.card_meme {
-  display: flex;
-  flex-direction: column;
-
-  width: 250px;
-  height: 150px;
-  background-image: url("../assets/img/memegenerator.svg");
-  background-size: cover;
-  background-position: center;
 }
 
 .container:hover {
-  background: linear-gradient(45deg, #f2e500, #969696);
+  background: linear-gradient(35deg, #969696, #f2e500,);
   opacity: 90%;
   color: black;
 }
 
-@keyframes glow {
-  from {
-    box-shadow: 0px 0px 5px 5px #f5f5dc;
-  }
-
-  to {
-    box-shadow: 0px 0px 10px 10px #f2e500;
-  }
+.container-button {
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: 10px;
 }
 
-@media screen and (max-width: 768px) {
+.button-detail {
+  color: black;
+  background-color: #f2e500;
+  width: 25%;
+}
+
+.button-play {
+  color: black;
+  background-color: #f2e500;
+  width: 25%;
+}
+
+.button-detail:hover{
+  color: black;
+  background-color: red;
+  width: 25%;
+}
+
+.button-play:hover{
+  color: black;
+  background-color: green;
+  width: 25%;
+}
+
+.button-detail:hover{
+  color: black;
+  background-color: red;
+  width: 25%;
+}
+
+.button-play:hover{
+  color: black;
+  background-color: green;
+  width: 25%;
 }
 </style>

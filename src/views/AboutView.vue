@@ -12,6 +12,7 @@ onMounted(() => {
 });
 </script>
 <template>
+
   <div class="--container-- flex flex-col justify-evenly m-auto items-center overflow-x-hidden" v-if="store.access">
     <BackgroundParticles />
     <div class="flex flex-col  text-white w-3/4   mt-36  m-7 p-2 border border-yellow-300 rounded-2xl">
@@ -79,11 +80,12 @@ onMounted(() => {
                 </div>
               </div>
             </div>
-
+           
         </div>
         <div class="border border-yellow-300 m-1 flex flex-col items-center md:flex-row rounded-2xl">
           <div
             class="border border-yellow-300 w-48 h-48 m-2 bg-white flex items-center justify-center rounded-full overflow-hidden">
+
             <img src="../assets/img/johan.svg" alt="Johan" class="w-full h-full object-cover" />
           </div>
           <div class="md:w-2/3 m-2 bg-black text-white">
@@ -195,7 +197,7 @@ onMounted(() => {
         <div class="border border-yellow-300 m-1 flex flex-col items-center md:flex-row rounded-2xl">
           <div
             class="border border-yellow-300 w-48 h-48 m-2 bg-white flex items-center justify-center rounded-full overflow-hidden">
-            <img src="../assets/img/icon.png" alt="Jose" class="w-full h-full object-cover" />
+            <img src="../assets/img/jose.svg" alt="Jose" class="w-full h-full object-cover" />
           </div>
           <div class="md:w-2/3 m-2 bg-black text-white">
               <div class="containerNombreImagen">

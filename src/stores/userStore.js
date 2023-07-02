@@ -4,6 +4,10 @@ import { defineStore } from "pinia";
 
 export const useUsers = defineStore("users", () => {
   const users = ref([]);
+  const email = ref('')
+  const uploadEmail = (data) => {
+    email.value = data
+  }
   const usersLength = ref(users.value.length)
   const usersAllAlways = ref([]);
   const uploadUsers = (usersInfo) => {
@@ -24,7 +28,7 @@ export const useUsers = defineStore("users", () => {
       usersLength.value = users.value.length
     }
   });
-  return { users, usersAllAlways, usersLength, uploadUsers, uploadUsersAllAlways };
+  return { email, uploadEmail, users, usersAllAlways, usersLength, uploadUsers, uploadUsersAllAlways };
 });
 
 export const useAccessStore = defineStore("access", () => {
@@ -67,7 +71,9 @@ export const useAccessStore = defineStore("access", () => {
   };
   const logOut = () => {
     access.value = false;
+    user.value = {}
     admin.value = false;
+    localStorage.setItem("admin", JSON.stringify(false));
   };
   const updateProfile = (data) => {
     (completeProfile.value.name = data.name),
@@ -77,7 +83,7 @@ export const useAccessStore = defineStore("access", () => {
       user.value = {...data}
   };
   const updateAdmin = (data) => {
-    if (data.email === "jairoholgado37a@gmail.com" && access.value) {
+    if (data.email === "henrymoon.latam@gmail.com" && access.value) {
       admin.value = true;
       ClienteService.getAllUsers()
         .then(({ data }) => storeOfUsers.uploadUsers(data))

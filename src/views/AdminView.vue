@@ -4,6 +4,9 @@ import ClienteService from "../services/ClienteService";
 import { useAccessStore } from "../stores/userStore";
 import { useUsers } from "../stores/userStore";
 import { useRouter } from "vue-router";
+import SearchBar from "../components/SearchBar.vue";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 const storeAccess = useAccessStore();
 const storeUsers = useUsers();
 const cohorts = ref(new Set());
@@ -18,26 +21,32 @@ const page = ref(1);
 const usersPerPage = 5;
 const pages = ref([]);
 
-const setPages = () => {
-  pages.value = new Array()
-  for (let i = 1; i <= Math.ceil(storeUsers.usersLength / usersPerPage); i++) {
-    if (!pages.value.includes(i)) {
-      pages.value.push(i);
-    }
-  }
-};
-
-const paginate = (users) => {
-  let from = page.value * usersPerPage - usersPerPage;
-  let to = page.value * usersPerPage;
-  return users.slice(from, to);
-};
-
 watch(currentUsers, () => {
   setPages();
 });
 
-const displayedUsers = computed(() => [...paginate(currentUsers.value)]);
+const displayedUsers = computed(() => {
+  const from = (page.value - 1) * usersPerPage;
+  const to = page.value * usersPerPage;
+  return storeUsers.users.slice(from, to);
+})
+
+const previusPage = () => {
+ if(page.value > 1) {
+   page.value--;
+ }
+}
+
+const nextPage = () => {
+ if(page.value < pages.value.length) {
+   page.value++;
+ }
+}
+
+const setPages = () => {
+  pages.value = Array.from({length: Math.ceil(storeUsers.users.length / usersPerPage)}, (_, index) => index + 1);
+}
+
 ////////////////////////////////////////////////////////
 onMounted(() => {
   if (!storeAccess.access || !storeAccess.admin) {
@@ -53,7 +62,31 @@ onMounted(() => {
   }
 });
 ///////////////////////////////////////////////
+
+const handleSearch = async (dataForm) => {
+  if (!dataForm.email) {
+    toast.warning("Make sure you enter the email of a user", {
+      position: toast.POSITION.BOTTOM_RIGHT,
+      autoClose: 3000,
+    });
+  } else {
+    const { data } = await ClienteService.searchByName({
+      email: dataForm.email,
+    });
+    storeUsers.uploadUsers(data);
+    currentUsers.value = storeUsers.users;
+    storeUsers.uploadEmail("");
+  }
+};
+const DEFAULT = ref("DEFAULT");
+const COHORT = ref("COHORT");
+const GROUP = ref("GROUP");
 const reload = () => {
+  DEFAULT.value = "DEFAULT";
+  COHORT.value = "COHORT";
+  GROUP.value = "GROUP";
+  cohorts.value = new Set()
+  groups.value = new Set()
   setPages();
   cohortsAndStudents.value = new Object();
   groupsAndStudents.value = new Object();
@@ -125,7 +158,8 @@ const handleUser = (id) => {
 <template>
   <div
     class="h-screen flex flex-col justify-evenly m-auto mt-10 overflow-x-hidden"
-  >
+  v-if="storeAccess.access"
+    >
     <div
       class="flex flex-col justify-evenly md:justify-evenly items-center space-y-2 md:space-y-0 mt-20 md:mt-24 p-3 text-white text-2xl font-bold overflow-hidden"
     >
@@ -156,8 +190,9 @@ const handleUser = (id) => {
           name="valueOfOrder"
           id=""
           @change="valueOfOrder"
+          v-model="DEFAULT"
         >
-          <option value="" selected>Order</option>
+          <option value="DEFAULT" selected>Order</option>
           <option value="DEFAULT" disabled>-- Order By Email --</option>
           <option value="A-Z">A-Z</option>
           <option value="Z-A">Z-A</option>
@@ -172,6 +207,7 @@ const handleUser = (id) => {
           class="text-white text-lg w-fit bg-gray-800 p-3 rounded-md border border-yellow-300 hover:bg-yellow-400 hover:text-black"
           name=""
           id=""
+          v-model="COHORT"
           @change="valueOfFilterOne"
         >
           <option value="COHORT" selected>Filter By Cohort</option>
@@ -187,6 +223,7 @@ const handleUser = (id) => {
           class="text-white text-lg w-fit bg-gray-800 p-3 rounded-md border border-yellow-300 hover:bg-yellow-400 hover:text-black"
           name=""
           id=""
+          v-model="GROUP"
           @change="valueOfFilterOne"
         >
           <option value="GROUP" selected>Filter By Group</option>
@@ -204,8 +241,16 @@ const handleUser = (id) => {
         >
           RELOAD
         </button>
+        <a
+          class="bg-yellow-300 p-3 rounded-md text-black font-bold w-fit text-lg hover:bg-gray-800 hover:text-white cursor-pointer"
+          href="https://henry-sup.netlify.app/" 
+          target="_blank"
+        >
+          ASISTENCIA
+        </a>
       </div>
       <h1>STUDENTS</h1>
+      <SearchBar @handle-search="handleSearch" :emailProp="email" />
       <div
         class="text-sky-50 text-lg flex flex-wrap justify-center items-center md:h-[70%] max-h-full overflow-y-auto"
         v-if="storeAccess.admin"
@@ -223,33 +268,33 @@ const handleUser = (id) => {
           </div>
         </div>
       </div>
-
-      <div
-        class="text-white flex m-auto w-full mt-2 md:w-[30%] md:mt-3 justify-center"
-      >
+      <!-- ACÁ COMIENZA LO QUE SON LOS BOTONES DEL PAGINADO -->
+      <div class="text-white flex m-auto w-full mt-2 md:w-[30%] md:mt-3 justify-center">
         <button
+          v-if="pages.length > 1"
           type="button"
           class="bg-yellow-300 p-2 m-2 rounded-md text-black font-bold hover:bg-gray-800 hover:text-white"
-          v-if="page != 1"
-          @click="page--"
+          @click="previusPage"
+          :disabled="page === 1"
         >
           Prev
         </button>
         <div class="flex space-x-2">
           <button
             type="button"
-            v-for="pageNumber in pages.slice(page - 1, page + 5)"
+            v-for="pageNumber in pages"
             @click="page = pageNumber"
             :key="pageNumber"
-            class="bg-yellow-300 p-2 m-2 rounded-md text-black font-bold hover:bg-gray-800 hover:text-white"
+            :class="['bg-yellow-300 p-2 m-2 rounded-md text-black font-bold hover:bg-gray-800 hover:text-white', { 'bg-gray-800 text-white': page === pageNumber }]"
           >
             {{ pageNumber }}
           </button>
         </div>
         <button
+          v-if="pages.length > 1"
           type="button"
-          @click="page++"
-          v-if="page < pages.length"
+          @click="nextPage"
+          :disabled="page === pages.length"
           class="bg-yellow-300 p-2 m-2 rounded-md text-black font-bold hover:bg-gray-800 hover:text-white"
         >
           Next

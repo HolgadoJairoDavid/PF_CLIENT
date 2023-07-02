@@ -1,43 +1,122 @@
 import api from "../lib/axios";
-
+import countries from "../lib/countries";
 export default {
-  register(data){
-    return api.post("/auth/signup", data)
+  register(data) {
+    return api.post("/auth/signup", data);
   },
-  registerThird(data){
-    return api.post("/auth/thirdsignup", data)
+  registerThird(data) {
+    return api.post("/auth/thirdsignup", data);
   },
   login(data) {
     return api.post("/auth/ownsignin", data);
   },
-  authentication(data){
-    return api.post('/auth/thirdsignin', data)
+  authentication(data) {
+    return api.post("/auth/thirdsignin", data);
   },
-  getUserById(id){
-    return api.get(`/user/${id}`)
+  getUserById(id) {
+    return api.get(`/user/${id}`);
   },
-  getAllUsers(){
-    return api.get('/user/all')
+  getAllUsers() {
+    return api.get("/user/all");
   },
-  deleteUserById(userId){
-    return api.delete(`/user/${userId}`)
+  deleteUserById(userId) {
+    return api.delete(`/user/${userId}`);
   },
-  updateUserById(userId, userData){
-    return api.post(`/user/${userId}`, userData)
+  reviveUser(id) {
+    return api.post(`/user/revive/${id}`);
   },
-  checkthird(user){
-    return api.post('/auth/checkthird', user)
+  updateUserById(userId, userData) {
+    return api.post(`/user/${userId}`, userData);
   },
-  logout(user){
-    return api.post('/logout', user)
+  sendEmail(userData) {
+    return api.post(`/auth/passwordcode`, userData);
   },
-  banUser(id){
-    return api.delete(`/user/${id}`)
+  changePassword(userData) {
+    return api.post(`/user/password`, userData);
   },
-  unBanUser(id){
-    return api.post(`/user/revive/${id}`)
+  searchByEmail(data) {
+    return api.post("/user/find", data);
   },
-  paypal(data){
-    return api.post('/payment/create-order', data)
+  checkthird(user) {
+    return api.post("/auth/checkthird", user);
+  },
+  logout(user) {
+    return api.post("/logout", user);
+  },
+  banUser(id) {
+    return api.delete(`/user/ban/${id}`);
+  },
+  unBanUser(id) {
+    return api.post(`/user/unBan/${id}`);
+  },
+  searchByName({ email }) {
+    return api.get(`/user/search/?email=${email}`);
+  },
+  getAllGames() {
+    return api.get(`/game/all`);
+  },
+  getGameById(id) {
+    return api.get(`/game/${id}`);
+  },
+  postComment(data) {
+    return api.post("/comment", data);
+  },
+  getAllComments(data) {
+    return api.post("/comment/all", data);
+  },
+  filterComments(data) {
+    return api.post("/comment/find", data);
+  },
+  deleteComment(id) {
+    return api.delete(`/comment/${id}`);
+  },
+  findUserByEmail(data) {
+    return api.post("/user/find", data);
+  },
+  // traer todas las cohortes
+  getAllCohorts() {
+    return api.get("/cohort/all");
+  },
+
+  // traer todos los grupos
+  getAllGroups(cohort) {
+    return api.get(`/group/all?cohort=${cohort}`);
+  },
+
+  // Rankings
+  getGlobalRanking() {
+    return api.get("/ranking/general");
+  },
+  getCohortRanking(cohort) {
+    return api.get(`/ranking/cohort/${cohort}`);
+  },
+  getGroupRanking(cohort, group) {
+    return api.get(`/ranking/group?cohort=${cohort}&group=${group}`);
+  },
+  //Para un usuario, total de puntos por juego y cantidad de veces que se jugó
+  getRankingInGamesByUser(userID) {
+    return api.get(`/ranking/ingames/${userID}`);
+  },
+  // total de phtos que obtuvo un usuario
+  totalRankingOfUser(userID) {
+    return api.get(`/ranking/total/${userID}`);
+  },
+  // cuenta un ranking para el juego de terceros
+  // data debe ser {userID, gameID, cohort, group}
+  countRankingThird(data) {
+    return api.post("/ranking/count", data);
+  },
+  // devuelve el ranking para un juego
+  gameRanking(gameID) {
+    return api.get(`/ranking/game/${gameID}`);
+  },
+
+  // COUNTRIES
+  getAllCountries() {
+    return countries.get("/countries");
+  },
+  // para paypal
+  getAllDonations(){
+    return api.get('/payment/all-donations')
   }
 };

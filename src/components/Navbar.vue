@@ -1,6 +1,6 @@
 <script setup>
 import { useAccessStore } from "../stores/userStore";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import CloudImage from "../components/CloudImage.vue";
 import socket from "../lib/socket";
@@ -10,21 +10,33 @@ const store = useAccessStore();
 const router = useRouter();
 const checkImage = store.user.image?.split('/').length
 const menuOpen = ref(false);
+const lightMode = ref(true)
 
+const setTheme = (mode)=>{
+  document.documentElement.setAttribute('data-theme', mode)
+} 
+const handleMode = ()=>{
+  if(lightMode.value){
+    setTheme("light")
+    lightMode.value = false
+  }else{
+    setTheme("dark")
+    lightMode.value = true
+  }
+}
 const toggleMenu = () => {
   menuOpen.value = !menuOpen.value;
 };
 const handleLogOut = async () => {
-  store.logOut();
   await clientServices.logout(store.user)
+  store.logOut();
   router.push({ name: "landing" });
-  socket.emit('logout', store.user)
 };
 
 </script>
 
 <template>
-  <nav class="bg-gray-900 w-full fixed top-0 --container--">
+  <nav class="nav">
     <div class="max-w-screen-xl mx-auto p-3 flex items-center justify-between">
       <div class="flex items-center space-x-2">
         <router-link
@@ -38,16 +50,20 @@ const handleLogOut = async () => {
         <li class="flex items-center" v-if="store.admin">
           <router-link
             :to="{ name: 'admin' }"
-            class="md:mx-2 text-white hover:text-yellow-300 cursor-pointer"
+            :class="lightMode ?  'text' : 'textL'"
             >Admin Dash</router-link
           >
         </li>
         <li class="flex items-center">
           <router-link
             :to="{ name: 'profile' }"
-            class="md:mx-2 text-white hover:text-yellow-300 cursor-pointer"
+            :class="lightMode ?  'text' : 'textL'"
           >
-          <img :src="store.user.image" alt="" v-if="checkImage >2"               class="w-16 h-16 border border-yellow-400 rounded-full object-cover ">
+          <img :src="store.user.image" 
+            alt="" 
+            v-if="checkImage >2"               
+            class="w-16 h-16 border border-yellow-400 rounded-full object-cover "
+            >
             <CloudImage
               :image-name="store.user.image"
               :key="store.user.image"
@@ -55,41 +71,49 @@ const handleLogOut = async () => {
               class="w-16 h-16 border border-yellow-400 rounded-full object-cover "
           /></router-link>
         </li>
-        <li class="text-center">
-          <router-link
-            :to="{ name: 'home' }"
-            class="text-white hover:text-yellow-300 cursor-pointer"
-            >Home</router-link
-          >
+        <li >
+          <button :class="lightMode ?  'text' : 'textL'">
+            <router-link
+              :to="{ name: 'home' }"
+              :class="lightMode ?  'text' : 'textL'"
+              >Home</router-link>
+          </button>
         </li>
-        <li class="text-center">
-          <router-link
-            :to="{ name: 'about' }"
-            class="text-white hover:text-yellow-300 cursor-pointer"
-            >About</router-link
-          >
+        <li >
+          <button :class="lightMode ?  'text' : 'textL'">
+            <router-link
+              :to="{ name: 'about' }"
+              :class="lightMode ?  'text' : 'textL'"
+              >About</router-link>
+          </button>
         </li>
-        <li class="flex items-center">
-          <router-link
-            :to="{ name: 'donation' }"
-            class="md:mx-2 text-white hover:text-yellow-300 cursor-pointer"
-            >Donation</router-link
-          >
+        <li >
+          <button :class="lightMode ?  'text' : 'textL'">
+            <router-link
+              :to="{ name: 'donation' }"
+              >Donation</router-link
+            >
+          </button>
         </li>
         <!-- <li class="flex items-center">
           <router-link
             :to="{ name: 'home' }"
-            class="md:mx-2 text-white hover:text-yellow-300 cursor-pointer"
+            class=""
             >My favorites</router-link
           >
         </li> -->
-        <li class="text-center">
+        <li >
           <button
             @click="handleLogOut"
-            class="text-white hover:text-yellow-300 cursor-pointer"
+            :class="lightMode ?  'text' : 'textL'"
           >
             Log Out
           </button>
+        </li>
+        <li>
+          <div class="mode">
+            <button @click="handleMode" ><i :class= "lightMode ? 'fa-solid fa-sun fa-xl':'fa-solid fa-moon fa-xl'" :style="lightMode ? 'color: #e2e8f0':'color: #111827' " ></i></button>
+          </div>
         </li>
       </ul>
       <button
@@ -119,5 +143,38 @@ const handleLogOut = async () => {
 <style lang="scss" scoped>
 .--container-- {
   z-index: 1000000;
+}
+
+.nav{
+  z-index: 1000000;
+  background-color: var(--container) ;
+  /* class="bg-gray-900 w-full fixed top-0 --container--" */
+}
+.mode{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: 25px;
+  width: 50px;
+  height: 50px;
+}
+
+.text{
+  color: var(--title);
+}
+
+.text:hover{
+  scale: 1.1;
+  color: var(--details);
+}
+
+.textL{
+  color: var(--title);
+}
+
+.textL:hover{
+  scale: 1.1;
+  color: rgb(176, 176, 252);
 }
 </style>

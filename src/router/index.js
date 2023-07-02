@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Landing from "../views/LandingView.vue";
-import About from "../views/AboutView.vue";
+// import About from "../views/AboutView.vue";
 
 
 const router = createRouter({
@@ -55,7 +55,7 @@ const router = createRouter({
     {
       path: "/updateUser",
       name: "updateUser",
-      component: ()=> import("../views/UpdateUser.vue")
+      component: ()=> import("../views/UpdateUserView.vue")
     },
     {
       path: "/admin/student-detail/:id",
@@ -63,9 +63,35 @@ const router = createRouter({
       component: ()=> import("../views/AdminStudentView.vue")
     },
     {
-      path: "/banned",
-      name: "banned",
-      component: ()=> import("../views/BannedView.vue")
+      path: "/game/:name",
+      name: "game",
+      component: ()=> import("../views/GameView.vue")
+    }, 
+    {
+      path: "/game",
+      name: "detailGame",
+      component: () => import("../views/DetailGame.vue")
+    },
+    {
+      path: "/deleted/:id",
+      name: "deleted",
+      component: ()=> import("../views/DeletedView.vue"),
+      params: true
+    },
+    {
+      path: "/recover",
+      name: "recover",
+      component: ()=> import("../views/RecoverAccountView.vue")
+    },
+    {
+      path: "/sendCode",
+      name: "sendCode",
+      component: () => import("../views/PasswordCodeView.vue")
+    },
+    {
+      path: "/setNewPassword",
+      name: "setNewPassword",
+      component: () => import("../views/PasswordSetView.vue")
     },
   ],
 });

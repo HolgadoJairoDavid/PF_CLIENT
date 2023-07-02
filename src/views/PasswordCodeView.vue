@@ -10,67 +10,85 @@ import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 const store = useAccessStore();
 import socket from "./../lib/socket";
+import { ref } from "vue";
 
 const router = useRouter();
 
-const handleSubmit = async (dataForm) => {
-  try {
-    const { data } = await ClienteService.login(dataForm);
-    if(data.user === null) {
-      toast.warning("this account don't exist", {
-        autoClose: 3000,
-      })
-      return
+
+
+function passCode() {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    return characters.charAt(randomIndex);
+}
+
+function passChain(length) {
+    let chain = '';
+    for (let i = 0; i < length; i++) {
+        chain += passCode();
     }
-    if(data.user.isBanned) {
-      router.push({name: 'banned'})
-      return
-    }
-    if (data.access) {
-      //AUFER ESTÁ TRABAJANDO EN LAS OTRAS PROPIEDADES
-      store.login(data.user);
-      store.updateAdmin(dataForm);
-      socket.emit('new-user')
-      router.push({ name: "home" });
-      return
-    } else {
-      toast.warning('This account has been deleted', {
+    return chain;
+}
+
+const chainLength = 4;
+const saveCode = ref("") //Acá se guarda el codigo
+
+const email = ref("")
+
+const handleCode = async ()=>{
+  if(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email.value) ){
+      try{
+        const randomChain = passChain(chainLength);
+        saveCode.value = randomChain
+        const {data} = await ClienteService.sendEmail({email: email.value, code: saveCode.value})
+        store.email = email.value
+        if(data.success){
+          toast.success('email sent, please check your inbox', {
+          autoClose: 3000,
+        });
+        }
+      } catch(error){
+        toast.warning(error.message, {
       autoClose: 3000,
     });
+    }
+  }
+}
 
-    } 
-    return
+const handleSubmit = async (dataForm) => {
+    try {
+        dataForm.code === saveCode.value ? router.push({ name: "setNewPassword" }) : toast.warning("Code does not match, try again", {
+      autoClose: 3000,
+    });
   } catch (error) {
-    console.log(error)
     toast.warning(error.message, {
       autoClose: 3000,
     });
-    return
   }
 };
-
 </script>
 <template>
-  <div
+    <div
     class="h-screen w-screen flex items-center justify-center overflow-hidden"
   >
     <BackgroundParticles />
     <div
-      class="--container--"
+    class="--container--"
     >
-      <img :src="welcome" alt="" class="h-36" />
-      <FormKit
+    <h1>Reset Your Password</h1>
+    <FormKit
         type="form"
         :actions="false"
         incomplete-message="Make sure all fields are filled"
         form-class="w-[100%] grid"
-        messages-class="text-red-500"
+        messages-class="text-red-500 mt-2"
         @submit="handleSubmit"
       >
         <FormKit
           type="email"
           name="email"
-          placeholder="Email"
+          v-model="email"
+          placeholder="Email to send confirmation"
           placeholder-class="input:focus:placeholder-transparent"
           validation="required | email"
           :validation-messages="{
@@ -79,49 +97,36 @@ const handleSubmit = async (dataForm) => {
           }"
           validation-visibility="blur"
           input-class="pb-2 pl-2 mt-2 caret-yellow-400 bg-black border-b-2 border-white focus:outline-none w-[100%]  focus:placeholder-transparent"
-          messages-class="text-red-500"
+          messages-class="text-red-500 mt-2"
         />
+        <span>
+            <input
+          type="button"
+          class="text-black text-xl mt-9 rounded-md p-2 w-[100%] tracking-wider font-medium cursor-pointer"
+          value="Send email"
+         @click="handleCode"
+        />
+        </span>
         <FormKit
           outer-class="background"
-          type="password"
-          name="password"
-          placeholder="Password"
+          type="text"
+          name="code"
+          placeholder="Enter code"
           validation="required"
           :validation-messages="{
-            required: 'Password is required',
+            required: 'Code is required',
           }"
           validation-visibility="blur"
-          v-model="passwordValidation"
-          @Change="handleChange"
           input-class="pb-2 pl-2 mt-7 caret-yellow-400 bg-black border-b-2 border-white focus:outline-none w-[100%] focus:placeholder-transparent"
-          messages-class="text-red-500"
+          messages-class="text-red-500 mt-2"
         />
         <input
           type="submit"
-          class="text-black text-xl mt-9 rounded-md p-2 tracking-wider font-medium cursor-pointer justify-items-center"
-          value="Login"
+          class="text-black text-xl mt-9 rounded-md p-2 tracking-wider font-medium cursor-pointer"
+          value="Check code ⌨️"
         />
         <!-- <p v-if=""> {{  }}</p> -->
       </FormKit>
-
-      <span class="mt-4"
-        >Do not you have an account yet?
-        <RouterLink :to="{ name: 'register' }"
-          ><span class="link"
-            >Sign up here</span
-          ></RouterLink
-        >
-      </span>
-
-      <span class="mt-4">
-        <RouterLink :to="{ name: 'sendCode' }"
-          ><span class="link"
-            >Did you forget your password?</span
-          ></RouterLink
-        >
-      </span>
-      <span class="mt-4">or Login with </span>
-      <Authentication />
     </div>
   </div>
 </template>
@@ -132,18 +137,14 @@ const handleSubmit = async (dataForm) => {
   background-color: black;
   z-index: 10000;
   animation: container 2s linear forwards;
-  position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   padding: 20px;
   border: solid 2px var(--border);
   border-radius: 15px;
-  width: 40%;
-  font-size: 18px;
-  
-
+  width: 50%;
+  font-size: 20px;
   @keyframes container {
     0% {
       opacity: 0;
@@ -181,12 +182,21 @@ input[type="submit"]:disabled {
   background-color: #d4bf0489;
   color: #00000087;
 }
-.link{
-  text-decoration: underline;
-  font-size: 18px;
-  color: var(--details);
+
+input[type="button"] {
+  background-color: var(--details);
+  transition: 0.5s;
+  border: solid 1px var(--details)
 }
-.link:hover{
+
+input[type="button"]:hover {
+  background-color: var(--container);
   color: var(--title);
+  border: solid 1px var(--details)
+}
+
+input[type="button"]:disabled {
+  background-color: #d4bf0489;
+  color: #00000087;
 }
 </style>

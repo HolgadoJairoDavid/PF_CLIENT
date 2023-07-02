@@ -9,12 +9,11 @@
 
 <style lang="scss" scoped>
 button {
-  color: var(--principal);
-  border: 3px var(--principal) solid;
+  color: var(--title);
+  border: 3px var(--details) solid;
   border-radius: 2rem;
 }
-button {
-  
+button {  
   text-shadow: 1px 1px 0.2rem #f8e007aa;
   transition: all .3s;
 }
@@ -27,15 +26,14 @@ button {
   display: inline-block;
 }
 .ov-btn-slide-left:hover {
-  color: #fff; /* color de fuente hover */
+  color: #000; /* color de fuente hover */
   text-shadow: 1px 1px 0.2rem rgb(144, 144, 144),
     1px 1px 0.2rem rgb(144, 144, 144), 1px 1px 0.2rem rgb(144, 144, 144);
-  box-shadow: 1px 1px 1rem var(--principal);
-  transform: scale(1.05);
+  box-shadow: 1px 1px 1rem var(--title);
 }
 .ov-btn-slide-left::after {
   content: "     ";
-  background: var(--principal); /* color de fondo hover */
+  background: var(--details); /* color de fondo hover */
   position: absolute;
   z-index: -1;
   display: block;
@@ -43,7 +41,7 @@ button {
   bottom: 0;
   left: -100%;
   right: 100%;
-  border: 7px var(--principal) solid;
+  border: 7px var(--details) solid;
   -webkit-transition: all 0.35s;
   transition: all 0.35s;
   border-radius: -2rem;
@@ -55,6 +53,6 @@ button {
   bottom: 0;
   -webkit-transition: all 0.35s;
   transition: all 0.35s;
-  box-shadow: 1px 1px 3px var(--principal);
+  box-shadow: 1px 1px 3px var(--title);
 }
 </style>

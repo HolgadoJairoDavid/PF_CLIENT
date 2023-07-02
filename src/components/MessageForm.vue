@@ -1,7 +1,7 @@
 <script setup>
 
   import { useAccessStore } from '@/stores/userStore'
-  import { inject, onMounted, ref } from 'vue';
+  import { inject, onMounted, onUpdated, ref } from 'vue';
   import { watch } from 'vue';
   import socket from "./../lib/socket";
 
@@ -17,26 +17,29 @@
   },[messages]) */
 
   const store = useAccessStore()
-
+  const scrollPix = ref(0)
   const message = ref('') // necesita el v-model
-
+  const div = ref('')
   const { 
     // socket,
     currentRoom,
     setMessages,
     messages,
-    privateMemberMsg
+    privateMemberMsg,
   } = inject('chat-context')
-
-  /* onMounted(() => {
-    scrollToBottom()
-  }) */
-
+  const newMessage = ref(false)
+  
   const messageEndRef = ref(null) // necesita ref="input" en el elemento
-
-  /* watch(currentRoom, () => {
+  const scroll = ref(null)
+  watch(currentRoom, () => {
     scrollToBottom()
-  }) */
+  })
+
+  watch(store.user.newMessages,()=>{
+    if(store.user.newMessages[currentRoom.value]){
+      newMessage.value = true
+    }
+  })
 
   const getFormatedDate = () => {
     const date = new Date()
@@ -48,63 +51,78 @@
     return `${month}/${day}/${year}`
   }
 
+
   const scrollToBottom = () => {
-    messageEndRef.value?.scrollIntoView({behavior: 'smooth'})
+    newMessage.value = false
+    store.user.newMessages[currentRoom.value] = 0
+    messageEndRef.value?.scrollIntoView({behavior: 'smooth', block: 'end' })
   }
+
+  
 
   
   const todayDate = getFormatedDate()
   
   const localMessages = ref({})
 
+
+
   socket.off('room-messages').on('room-messages', (roomMessages) => {
-
     localMessages.value = roomMessages
-
     if(roomMessages.room === currentRoom.value) {
       setMessages(roomMessages)
     }
 
   })
 
+
+  const handleScroll = ()=>{
+    if(scroll.value.scrollTop>scrollPix.value){
+      newMessage.value = false
+      scrollPix.value = scroll.value.scrollTop
+    }
+  }
+
   onMounted(() => {
+    setTimeout(()=>{
+      messageEndRef.value.scrollIntoView({behavior: 'smooth', block: 'end' })
+    }, 500)
     setMessages(localMessages.value)
+    scrollPix.value = scroll.value.scrollTop
   })
+
 
   const setMessage = () => {
     message.value = ''
   }
 
   const handleSubmit = () => {
-
     if(!message.value) return
     
     const today = new Date()
     
     const minutes = today.getMinutes() < 10 ? '0' + today.getMinutes() : today.getMinutes()
-
+    
     const time = today.getHours() + ':' + minutes
-
+    
     const roomId = currentRoom.value
-
+    
     socket.emit('message-room', roomId, message.value, store.user, time, todayDate)
-
+    
     setMessage()
+
+    setTimeout(()=>{
+      messageEndRef.value.scrollIntoView({behavior: 'smooth', block: 'end' })
+    },500) 
+    
   }
 
 </script>
 
 <template>
+  <div class='messages-output' @scroll="handleScroll" ref="scroll">
 
-  <div class='messages-output'>
 
-
-        <div 
-          v-if="store.user.name && !privateMemberMsg?._id"
-          class="bg-cyan-400 p-2 mb-2"
-        >
-          <span>You are in the <b>{{ currentRoom }}</b> room</span>
-        </div>
         <!-- { 
           user && !privateMemberMsg?._id 
           &&  <div className='alert alert-info'>
@@ -121,84 +139,88 @@
               </div>
         } -->
 
-        <div v-if="store.user">
+        <div class="chatbox"  ref="messageEndRef" v-if="store.user">
         
-          <div v-for="message in messages.messages">
-            <p class="bg-yellow-400 p-2 m-2 text-center border border-black rounded-lg">{{ message._id }}</p>
+          <div  v-for="message in messages.messages">
+            <p class="fecha">{{ message._id }}</p>
 
             <div v-for="msg in message.messagesByDate">
               <div 
-                :class="[msg.from.email === store.user.email ? 'bg-yellow-400' : 'bg-gray-300']"
-                class="m-2 p-2 border border-black rounded-lg"
+              :class="[msg.from.email === store.user.email ? 'me' : 'others']"
               >                
-
+              
+              <p class="name"> 
+                {{ msg.from._id === store.user._id ? '' : msg.from.name }}
+              </p>
                 <div class="message-inner ">
                   <div> <!-- Debe ser flex -->
 
-                    <p class="message-sender"> 
-                      {{ msg.from._id === store.user._id ? 'You:' : msg.from.name }}
-                    </p>
                   </div>
                   <p class="message-content text-justify">{{ msg.content }}</p>
-                  <p class="message-timestamp-right text-right">{{ msg.time }} ✔</p>
+                  <div>
+                    <p class="time">{{ msg.time }} ✔</p>
+                  </div>
                 </div>
               </div>
+              <div :class="[msg.from.email === store.user.email ? 'triangulo' : 'triangle']"></div>
             </div>
           </div>
-          <div ref="messageEndRef"></div>
+          <div class="messageEnd" ></div>
         </div> 
-
+        
         <!-- {
           user && messages.map(({_id: date, messagesByDate}, idx) => {
-          return (
-            <div key={idx}>
-              <p className='alert alert-info text-center message-date-indicator'>
-                {date}
-              </p>
-              {
-                messagesByDate?.map(({content, time, from: sender}, idx) => {
-                  return (
-                    <div className={sender?.email === user?.email ? 'message' : 'incoming-message'} key={idx}>
-                      <div className='message-inner'>
-                        <div className='d-flex align-items-center mb-3'>
-                          {/* Aquí va la img */}
-                          <p className='message-sender'>{sender._id === user?._id ? 'You' : sender.name}</p>
-                        </div> 
-                        <p className='message-content'>{content}</p>
-                        <p className='message-timestamp-left'>{time}</p>
+            return (
+              <div key={idx}>
+                <p className='alert alert-info text-center message-date-indicator'>
+                  {date}
+                </p>
+                {
+                  messagesByDate?.map(({content, time, from: sender}, idx) => {
+                    return (
+                      <div className={sender?.email === user?.email ? 'message' : 'incoming-message'} key={idx}>
+                        <div className='message-inner'>
+                          <div className='d-flex align-items-center mb-3'>
+                            {/* Aquí va la img */}
+                            <p className='message-sender'>{sender._id === user?._id ? 'You' : sender.name}</p>
+                          </div> 
+                          <p className='message-content'>{content}</p>
+                          <p className='message-timestamp-left'>{time}</p>
+                        </div>
                       </div>
-                    </div>
                   )
                 }) 
               }
             </div>
-          )
+            )
         })}
         <div ref={messageEndRef}></div>
       </div>
         -->
         
         <!-- :disabled="[!store.user]" -->
-        <form @submit.prevent="handleSubmit" class="flex flex-row  sticky bottom-0 w-full">
-     
+        <div class="boxInput" >
+          <button class="bajar" v-if="newMessage" @click="scrollToBottom">{{ store.user.newMessages[currentRoom] }}  🔽</button>
+          <form @submit.prevent="handleSubmit" class="flex flex-row  sticky bottom-0 w-full" >
+            
             <input 
             class="text-white bg-black border border-yellow-400 m-2 w-3/4 pl-2 rounded-l-lg"
-              type="text" 
-              placeholder="Your message"
-              v-model="message"
+            type="text" 
+            placeholder="Your message"
+            v-model="message"
             >
             <button
-
-
+            
             class="text-black m-2 p-2 bg-yellow-400 rounded-e-lg"
-              @click.prevent="handleSubmit"
-
-              type="submit"
-            >
-              Send
-            </button>
-       
-        </form>
+            @click.prevent="handleSubmit"
+            
+                type="submit"
+                >
+                Send
+              </button>
+            </form>
+            
+        </div>
 
       <!-- <form onSubmit={handleSubmit}>
 
@@ -228,9 +250,116 @@
 <style scoped>
 
 .messages-output {
-  background-color: gray;
-  border: 1px solid gray;
   min-height: 100%;
+  overflow-y: scroll;
+  width: 350px;
+  height: 70vh;
+}
+
+.messageEnd {
+  height: 50px;
+}
+
+.triangulo {
+    margin-left: 305px;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 15px solid #F2E500;
+  }
+
+
+  .triangle {
+    margin-left: 18px;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 15px solid #EDEDED;
+  }
+
+  .fecha{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    color: #111827;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    width: 100%;
+    background-color: #F2E500;
+  }
+.message{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 30px;
+  background-color: #F2E500;
+}
+
+.name{
+  font-size: 13px;
+}
+
+.boxInput{
+  width: 100%;
+  bottom: 0;
+  position: absolute;
+}
+
+
+.bajar{
+  color: white;
+  z-index: 10;
+  width: 30px;
+  height: 30px;
+  margin-left: 300px;
+  margin-bottom: 20px;
+  background-color: red;
+  border-radius: 50%;
+}
+.me{
+  color: #111827;
+  font-size: 16px;
+  padding: 2px;
+  height: auto;
+  word-break: break-word;
+  display: flex;
+  flex-direction: column;
+  border-radius: 7px;
+  margin-top: 10px;
+  margin-left: 35px;
+  width: 300px;
+  background-color: #F2E500;
+  border: none;
+}
+
+.others{
+  color: #111827;
+  padding: 2px;
+  height: auto;
+  word-break: break-word;
+  display: flex;
+  flex-direction: column;
+  border-radius: 7px;
+  margin-top: 10px;
+  margin-left: 10px;
+  width: 300px;
+  background-color: #EDEDED;
+  border: none;
+}
+
+.chatbox{
+  border-radius: 15px 15px 0px 15px;
+  background-color: #111827;
+}
+
+.time{
+  margin-left: 240px;
+  font-size: 12px;
+  margin-bottom: 3px;
 }
 
 </style>

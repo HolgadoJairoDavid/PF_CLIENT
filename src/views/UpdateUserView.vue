@@ -5,17 +5,37 @@ import ClienteService from "../services/ClienteService";
 import BackgroundParticles from "../components/UI/BackgroundParticles.vue";
 import { useAccessStore } from "../stores/userStore";
 import CloudImage from "../components/CloudImage.vue";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
+import Helpers from "../helpers";
+
 const store = useAccessStore();
 const router = useRouter();
+
+let user = ref({});
+const countries = ref([])
+
+onMounted(async () => {
+  if (!store.access) {
+    router.push({ name: "login" });
+    return;
+  } else {
+    user = {...store.user}
+   
+
+    const {data: countriesData} = await ClienteService.getAllCountries()
+    countries.value = [...Helpers.beautifyCountries(countriesData)]
+  }
+});
 
 const widget = window.cloudinary.createUploadWidget(
   { cloud_name: "HenryMoon", upload_preset: "sm7kib26" },
   (error, result) => {
     if (!error && result && result.event === "success") {
       uploadedImage.value = result.info.public_id;
+      user.image = uploadedImage;
+      checkImage = 2;
     }
   }
 );
@@ -26,22 +46,35 @@ function openUploadWidget() {
 let uploadedImage = ref(store.user.image);
 const handleSubmit = async (dataForm) => {
   dataForm.image = uploadedImage.value;
-   console.log(dataForm)
   try {
-    const { data } = await ClienteService.updateUserById(store.user._id, dataForm);
+    const { data } = await ClienteService.updateUserById(
+      user._id,
+      dataForm
+    );
+
     store.updateProfile(data);
     router.push({ name: "profile" });
   } catch (error) {
-    toast.warning('That user already exists', {
-        autoClose: 3000,
-      });
+    toast.warning("Wrong", {
+      autoClose: 3000,
+    });
   }
 };
+const date = store.user.birthdate
+  ? store.user.birthdate.slice(0, 10)
+  : "01/01/2000";
+
+const redirectToProfile = () => {
+  router.push({ name: "profile" });
+};
+
+const checkImage = user.image?.split("/").length;
 </script>
 <template>
   <div
     class="overflow-x-hidden h-screen w-screen flex items-center justify-center"
-  >
+  v-if="store.access"
+    >
     <BackgroundParticles />
     <div
       class="--container-- rounded-xl border-yellow-200 bg-black mt-9 border-2 p-5 w-[50%] grid place-items-center"
@@ -58,7 +91,7 @@ const handleSubmit = async (dataForm) => {
           type="text"
           name="name"
           placeholder="Name"
-          v-model="store.user.name"
+          v-model="user.name"
           placeholder-class="input:focus:placeholder-transparent"
           validation="required"
           :validation-messages="{
@@ -67,13 +100,12 @@ const handleSubmit = async (dataForm) => {
           validation-visibility="blur"
           input-class="pb-2 mt-7 bg-black border-b-2 border-white focus:outline-none w-[100%] focus:placeholder-transparent"
           messages-class="text-red-600"
-
         />
         <FormKit
           type="text"
           name="lastName"
           placeholder="Last Name"
-          v-model="store.user.lastName"
+          v-model="user.lastName"
           placeholder-class="input:focus:placeholder-transparent"
           validation="required"
           :validation-messages="{
@@ -83,44 +115,32 @@ const handleSubmit = async (dataForm) => {
           input-class="pb-2 mt-7 bg-black border-b-2 border-white focus:outline-none w-[100%] focus:placeholder-transparent"
           messages-class="text-red-600"
         />
+
         <FormKit
-          type="text"
-          name="cohort"
-          disabled
-          v-model="store.user.cohort"
-          placeholder="Cohorte, example: 37a"
-          placeholder-class="input:focus:placeholder-transparent"
-          validation-visibility="blur"
-          input-class="pb-2 mt-7 bg-black border-b-2 border-white focus:outline-none w-[100%] focus:placeholder-transparent"
-          messages-class="text-red-600"
-        />
-        <FormKit
-          type="number"
-          min="1"
-          name="group"
-          v-model="store.user.group"
-          placeholder="Group, example: 11"
+          type="select"
+          name="country"
+          :options="countries"
+          placeholder="Country"
+          v-model="user.country"
           placeholder-class="input:focus:placeholder-transparent"
           validation="required"
-          disabled
           :validation-messages="{
-            required: 'Group is required',
+            required: 'Country is required',
           }"
           validation-visibility="blur"
           input-class="pb-2 mt-7 bg-black border-b-2 border-white focus:outline-none w-[100%] focus:placeholder-transparent"
           messages-class="text-red-600"
         />
         <FormKit
-          type="email"
-          name="email"
-          placeholder="Email"
-          placeholder-class="input:focus:placeholder-transparent"
+          type="text"
+          name="birthdate"
+          placeholder="Birthdate"
+          v-model="date"
           disabled
-          v-model="store.user.email"
-          validation="required | email"
+          placeholder-class="input:focus:placeholder-transparent"
+          validation="required"
           :validation-messages="{
-            required: 'Email is required',
-            email: 'Please enter a valid email address',
+            required: 'Birthdate is required',
           }"
           validation-visibility="blur"
           input-class="pb-2 mt-7 bg-black border-b-2 border-white focus:outline-none w-[100%] focus:placeholder-transparent"
@@ -130,23 +150,38 @@ const handleSubmit = async (dataForm) => {
         <div class="flex flex-col md:flex-row mt-5 justify-evenly items-center">
           <input
             type="button"
-            class="text-black text-xl mt-9 rounded-md p-2 tracking-wider font-medium cursor-pointer justify-items-end"
+            class="text-black text-xl mt-9 rounded-md p-2 tracking-wider font-bold cursor-pointer justify-items-end"
             @click="openUploadWidget()"
             value="Update profile image"
           />
 
+          <img
+            :src="user.image"
+            alt=""
+            v-if="checkImage > 2"
+            class="w-60 border border-yellow-400 rounded-full object-cover"
+          />
           <CloudImage
             :image-name="uploadedImage"
             :key="uploadedImage"
+            v-if="checkImage === 2"
             style="width: 150px; height: 150px"
           />
-          
         </div>
-        <input
-          type="submit"
-          class="text-black text-xl mt-9 rounded-md p-2 tracking-wider font-medium cursor-pointer justify-items-end"
-          value="Update"
-        />
+        <div class="flex flex-row justify-evenly mt-6">
+          <button
+            type="button"
+            class="w-fit px-10 bg-red-400 hover:bg-red-700 text-black text-center font-bold rounded-lg"
+            @click="redirectToProfile"
+          >
+            Cancel
+          </button>
+          <input
+            type="submit"
+            class="text-black text-xl w-[50%] px-10 bg-yellow-400 hover:bg-yellow-700 rounded-md font-bold p-2 tracking-wider cursor-pointer justify-items-end"
+            value="Update"
+          />
+        </div>
       </FormKit>
 
       <!-- La variable "uploadedImage" es la que tiene el id de la imagen que se busca en Cloudinary para mostrar, eso deberia ser lo que se mande en el form -->
@@ -166,21 +201,25 @@ const handleSubmit = async (dataForm) => {
     0% {
       opacity: 0;
     }
+
     100% {
       opacity: 1;
     }
   }
 }
+
 @media (max-width: 900px) {
   .--container-- {
     width: 60%;
   }
 }
+
 @media (max-width: 500px) {
   .--container-- {
     width: 90%;
   }
 }
+
 input[type="submit"] {
   background-color: var(--principal);
   transition: 0.5s;

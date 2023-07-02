@@ -14,7 +14,8 @@ const route = useRoute();
 /* ! ////////////// */
 
 
-  
+
+  // const SOCKET_URL = 'http://localhost:5001'
   // const socket = io(SOCKET_URL)
 
   const rooms = ref([])
@@ -44,6 +45,7 @@ const route = useRoute();
   }
 
   provide('chat-context', {
+ 
     // socket,
     rooms,
     setRooms,
@@ -68,6 +70,8 @@ const routesToNavBar = [
   "admin",
   "donation",
   "studentView",
+  "game",
+  "detailGame"
 ];
 
 </script>
@@ -86,12 +90,19 @@ const routesToNavBar = [
 
 <style lang="scss">
 :root {
-  --body: #000;
-  --container: #191919;
-  --border: #969696;
-  --content: #ededed;
-  --title: #fff;
-  --principal: #f2e600;
+  --body: #020617;
+  --container: #0f172a;
+  --border: #64748b;
+  --title: #e2e8f0;
+  --details: #f2e600;
+}
+
+:root[data-theme="light"]{
+  --body: #9f9f9f;
+  --container:#f8fafc;
+  --border: #334155;
+  --title: #0f172a;
+  --details: #f2e600;
 }
 
 * {
@@ -103,7 +114,7 @@ body {
   background-color: var(--body);
 }
 ::-webkit-scrollbar {
-  width: 7px;
+  width: 8px;
   background-color: var(--border);
 }
 

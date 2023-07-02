@@ -1,17 +1,25 @@
 <script setup>
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { onMounted, onUnmounted, ref } from "vue";
 import ClienteService from "../services/ClienteService";
-import { useUsers } from "../stores/userStore";
+import { useUsers, useAccessStore } from "../stores/userStore";
 import CloudImage from "../components/CloudImage.vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
+
 const storeUsers = useUsers();
+const storeAccess = useAccessStore()
 const route = useRoute();
+const router = useRouter();
 const id = route.params.id;
 const user = ref({});
+const cohortValue = ref("");
+const groupValue = ref("");
+const cohorts = ref(new Set());
+const groups = ref(new Set());
+//////////////////////////////////////////////////
 const banUser = async () => {
-  if (user.value.isDeleted) {
+  if (user.value.isBanned) {
     const { data } = await ClienteService.unBanUser(id);
     toast.success("Unbanned", {
       position: toast.POSITION.BOTTOM_RIGHT,
@@ -24,11 +32,13 @@ const banUser = async () => {
     });
   } else {
     const { data } = await ClienteService.banUser(id);
+    console.log(data);
     toast.warning("Banned", {
       position: toast.POSITION.BOTTOM_RIGHT,
       autoClose: 3000,
     });
     ClienteService.getAllUsers().then(({ data }) => {
+
       storeUsers.uploadUsers(data);
 
       user.value = storeUsers.users.find((user) => user._id === id);
@@ -36,18 +46,72 @@ const banUser = async () => {
   }
 };
 const checkImage = ref(0);
+
 onMounted(() => {
+
+  if (!storeAccess.access) {
+    router.push({ name: "login" });
+    return
+  }
+
   user.value = storeUsers.users.find((user) => user._id === id);
-  checkImage.value = user.value.image.split("/").length;
+  console.log(user.value);
+  checkImage.value = user?.value.image.split("/").length;
+  cohortValue.value = user.value.cohort;
+  groupValue.value = user.value.group;
+  
+
+  //---------------------------//
+
+  for (let i = 0; i < storeUsers.users.length; i++) {
+    if (!cohorts.value.has(storeUsers.users[i].cohort)) {
+      cohorts.value.add(storeUsers.users[i].cohort);
+    }
+  }
+  const cohortsArray = [...cohorts.value];
+  cohortsArray.sort();
+  cohorts.value = new Set(cohortsArray);
+
+  //---------------------------------------//
+
+  for (let i = 0; i < storeUsers.users.length; i++) {
+    if (storeUsers.users[i].cohort === storeAccess.user.cohort) {
+      if (!groups.value.has(storeUsers.users[i].group)) {
+        groups.value.add(storeUsers.users[i].group);
+      }
+    }
+  }
 });
 onUnmounted(() => {
   user.value = {};
 });
+
+////////////////////////////////
+
+const updateUser = () => {
+ const dataUpdate = {
+  cohort: cohortValue.value,
+  group: groupValue.value
+ }
+ ClienteService.updateUserById(id, dataUpdate).then(({data})=> {
+  user.value = {...data}
+  toast.success("The user was successfully updated", {
+      position: toast.POSITION.BOTTOM_RIGHT,
+      autoClose: 3000,
+    });
+ })
+
+ ClienteService.getAllUsers().then(({data})=>{
+  storeUsers.uploadUsers(data)
+ })
+ return
+};
 </script>
 <template>
   <div
     class="--container-- border border-yellow-300 m-2 p-2 flex flex-col mt-40 items-center md:flex-row"
-  >
+  v-if="storeAccess.access"
+    >
     <div class="flex flex-col items-center">
       <div
         class="border border-yellow-300 w-[200px] m-3 rounded-full overflow-hidden"
@@ -72,7 +136,29 @@ onUnmounted(() => {
 
       <div class="text-2xl m-4 text-left">
         <p>{{ user.email }}</p>
-        <p>Group {{ user.group }}</p>
+        <p>
+          Cohort
+          <select
+            name=""
+            id=""
+            v-model="cohortValue"
+            class="text-white text-lg bg-gray-800 p-3 rounded-md border border-yellow-300 hover:bg-yellow-400 hover:text-black"
+          >
+            <option v-for="cohort in cohorts" :value="cohort">
+              {{ cohort }}
+            </option>
+          </select>
+        </p>
+        <p>Group <select
+            name=""
+            id=""
+            v-model="groupValue"
+            class="text-white text-lg bg-gray-800 p-3 rounded-md border border-yellow-300 hover:bg-yellow-400 hover:text-black"
+          >
+            <option v-for="group in groups" :value="group">
+              {{ group }}
+            </option>
+          </select></p>
         <p>TA: TA-Name</p>
         <p>Total Points: 500</p>
       </div>
@@ -80,14 +166,23 @@ onUnmounted(() => {
         ><button
           type="button"
           :class="[
-            user.isDeleted
+            user.isBanned
               ? 'bg-red-400 hover:bg-red-700'
               : 'bg-green-400 hover:bg-green-700',
           ]"
           class="w-fit px-10 text-black text-center font-bold uppercase rounded-lg"
           @click="banUser"
         >
-          {{ !user.isDeleted ? "unbanned" : "banned" }}
+          {{ !user.isBanned ? "unbanned" : "banned" }}
+        </button></span
+      >
+
+      <span class="text-lg"
+        ><button
+          class="w-fit m-5 px-10 bg-yellow-400 hover:bg-yellow-700 text-black text-center font-bold uppercase rounded-lg"
+          @click="updateUser"
+        >
+          Update user
         </button></span
       >
     </div>

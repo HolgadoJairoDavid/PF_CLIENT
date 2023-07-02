@@ -33,7 +33,7 @@ updateClass();
 
         <RouterLink :to="{ name: 'login' }"
           ><ButtonLanding :class="giveClass ? 'focus' : 'notFocus'"
-            >Let's Go</ButtonLanding
+            >Let's Go!</ButtonLanding
           ></RouterLink
         >
       </div>

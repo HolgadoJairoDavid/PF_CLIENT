@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://henrymoonapi.onrender.com",
+  baseURL: "https://pfapi-production.up.railway.app",
 });
 
 export default api;

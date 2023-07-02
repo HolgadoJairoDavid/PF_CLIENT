@@ -6,9 +6,10 @@
   import Room from './Room.vue';
   import Member from './Member.vue';
   import socket from "./../lib/socket";
+import { ref } from 'vue';
 
   const store = useAccessStore()
-
+  const memberName = ref('')
   // const dispatch = useDispatch()
   // const user = useSelector(store => store.user)
   /* const { 
@@ -44,9 +45,14 @@
     currentRoom
   } = inject('chat-context')
 
+  const viewMembers = ref(false)
   const joinRoom = (room, isPublic = true) => {
     
     console.log(room)
+
+    if(isPublic){
+      memberName.value = ''
+    }
 
     if (!store.user) {
       return alert('Please Login')
@@ -64,7 +70,8 @@
   }
 
   socket.off('notifications').on('notifications',(room) => {
-    if(currentRoom.value !== room) store.addNotifications(room)
+    /* if(currentRoom.value !== room) store.addNotifications(room) */
+    store.addNotifications(room)
   })
 
   onMounted(() => {
@@ -82,7 +89,7 @@
 
   const getRooms = async () => {
     const response = await fetch(
-      'https://henrymoonapi.onrender.com/chat/rooms',
+      'https://henrymoonback.onrender.com/chat/rooms',
       {
         method: "GET",
         headers: {"Content-type": "application/json;charset=UTF-8"}
@@ -101,33 +108,46 @@
 
   const handlePrivateMemberMsg = (member) => {
     setPrivateMemberMsg(member)
+    memberName.value = member.name
     const roomId = orderIds(store.user._id, member._id)
     joinRoom(roomId, false)
-    setCurrentRoom(roomId) // ! ////
+    setCurrentRoom(roomId)
+    if(viewMembers.value){
+      viewMembers.value=false
+    }else{
+      viewMembers.value = true
+    }
+    // ! ////
   }
 
-  const ejemplo = () => {
-    // console.log(members)
-    console.log(`current: ${currentRoom.value}`)
+  const handleMembersView = ()=>{
+    if(viewMembers.value){
+      viewMembers.value=false
+    }else{
+      viewMembers.value = true
+    }
   }
+
 
 </script>
 
 <template>
   
-  <div class="sidebar flex flex-col">
-    <h2 class="bg-yellow-400 p-2 text-center text-lg"
-      @click="ejemplo"
-    >Available Rooms</h2>
-
-    <!-- <div>
-
-      <p v-for="room in rooms"></p>
-
-    </div> -->
-
-    
-    <div>
+  
+  <h2 @click="handleMembersView" class="titlemem">Members</h2>
+  <div v-if="viewMembers" class="members">
+    <Member
+      v-for="member in members"
+      :newMessages="store.user?.newMessages[orderIds(member._id,store.user._id)]" 
+      @click="handlePrivateMemberMsg(member)"
+      :member="member"
+      :user="store.user"
+      
+    />
+  </div>
+  <div>
+    <div class="title">Rooms</div>
+    <div class="box">
       <Room
         v-for="room in rooms"
         :newMessages="store.user.newMessages[room]"
@@ -136,77 +156,11 @@
         @click="joinRoom(room)"
       />
     </div>
-
-      <!-- <ListGroup>
-        {rooms?.map((room, idx) => {
-          return (
-            <ListGroup.Item 
-              key={idx} 
-              onClick={() => joinRoom(room)}
-              active={room === currentRoom}
-              style={{cursor: 'pointer', display: 'flex', justifyContent: 'space-between'}}
-            >
-              {room} {currentRoom !== room && <span className='badge rounded-pill bg-primary'>{user.newMessages[room]}</span>}
-            </ListGroup.Item>
-          )
-        })}
-      </ListGroup> -->
-
-      <h2 class="bg-yellow-400 p-2 text-center text-lg">Members</h2>
-
-      
-      <div>
-        <Member
-          v-for="member in members"
-          :newMessages="store.user?.newMessages[orderIds(member._id,store.user._id)]" 
-          @click="handlePrivateMemberMsg(member)"
-          :member="member"
-          :user="store.user"
-          
-        />
-      </div>
-
-      <!-- {members.map((member) => {
-        return (
-          <ListGroup.Item 
-            key={member._id} 
-            style={{cursor: 'pointer', height: '2rem'}}
-
-            active={privateMemberMsg?._id === member?._id}
-
-            onClick={() => handlePrivateMemberMsg(member)} 
-
-            disabled={member._id === user._id}
-          >
-            <Row>
-              <Col xs={2} className='member-status' style={{height: '1rem'}}>
-                {
-                  member.status === 'online' 
-                    ? <i className='sidebar-online-status'><BsFillCircleFill/></i> 
-                    : <i className='sidebar-offline-status'><BsFillCircleFill/></i>
-                }
-              </Col>
-              <Col xs={8} className='member-status' style={{height: '1rem'}}>
-                {
-                  <span>{member.name}</span>
-                }
-                {
-                  member._id === user?._id && " ( You )"
-                }
-                {
-                  member.status === 'offline' && '(Offline)'
-                }
-              </Col>
-                <Col xs={2}>
-                  <span className='badge rounded-pill bg-primary'>
-                    {user.newMessages[orderIds(member._id, user._id)]}
-                  </span>
-                </Col>
-            </Row>
-          </ListGroup.Item>
-        )
-      })} -->
-      
+    <div  v-if=" memberName !== ''" class="name">
+      <span >
+        Chat con: {{ memberName }}
+      </span>
+    </div>
   </div>
 
 </template>
@@ -218,5 +172,64 @@
     background-color: gray;
     min-height: 100%;
   }
+  .box{
+  width: 350px;
+  border-bottom: 8px solid #F2E500;
+  color: white;
+  height: 40px;
+  background-color: #111827;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+}
+
+.name{
+  background-color: #F2E500;
+  width: 100%;
+  height: 25px;
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  color: #111827;
+}
+.title{
+  height: 30px;
+  color: white;
+  align-items: center;
+  text-align: center;
+  background-color: #111827;
+  border-radius: 10px 10px 0px 0px;
+}
+
+.titlemem{
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+  height: 30px;
+  color: white;
+  align-items: center;
+  text-align: center;
+  background-color: #111827;
+  border-radius: 10px;
+  border: 2px solid #969696;
+}
+
+.titlemem:hover{
+  font-size: 18px;
+}
+
+
+
+.members{
+  width: 350px;
+  position: absolute;
+  z-index: 10;
+  border: 2px solid #969696;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  background-color: #111827;
+}
 
 </style>

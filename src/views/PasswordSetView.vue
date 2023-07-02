@@ -2,6 +2,7 @@
 import { FormKit } from "@formkit/vue";
 import BackgroundParticles from "../components/UI/BackgroundParticles.vue";
 import ClienteService from "../services/ClienteService";
+import {onMounted} from "vue";
 import { useRouter, useRoute } from "vue-router";
 import Authentication from "../components/Authentication.vue";
 import welcome from "../assets/img/HenryMoon.svg";
@@ -13,53 +14,43 @@ import socket from "./../lib/socket";
 
 const router = useRouter();
 
+onMounted(async() => {
+  const {data} = await ClienteService.searchByEmail({email: store.email})
+})
+
 const handleSubmit = async (dataForm) => {
-  try {
-    const { data } = await ClienteService.login(dataForm);
-    if(data.user === null) {
-      toast.warning("this account don't exist", {
-        autoClose: 3000,
-      })
-      return
-    }
-    if(data.user.isBanned) {
-      router.push({name: 'banned'})
-      return
-    }
-    if (data.access) {
-      //AUFER ESTÁ TRABAJANDO EN LAS OTRAS PROPIEDADES
-      store.login(data.user);
-      store.updateAdmin(dataForm);
-      socket.emit('new-user')
-      router.push({ name: "home" });
-      return
-    } else {
-      toast.warning('This account has been deleted', {
+    try {
+        if(dataForm.password === dataForm.repeatPassword){
+          await ClienteService.changePassword({email: store.email, password: dataForm.password })
+          toast.success("Password changed successfully, Redirecting...", {
+            autoClose: 3000,
+          });
+          function loginRedirect(){
+            router.push({ name: "login" })
+          }
+          setTimeout(loginRedirect, 2000)
+        }  else toast.warning("Passwords does not match", {
       autoClose: 3000,
     });
-
-    } 
-    return
-  } catch (error) {
-    console.log(error)
-    toast.warning(error.message, {
+    }
+   catch (error) {
+    toast.warning("not sending", {
       autoClose: 3000,
     });
-    return
   }
-};
-
+}
+;
 </script>
 <template>
-  <div
+    <div
     class="h-screen w-screen flex items-center justify-center overflow-hidden"
   >
     <BackgroundParticles />
     <div
-      class="--container--"
+    class="--container--"
     >
-      <img :src="welcome" alt="" class="h-36" />
-      <FormKit
+    <h1>New password</h1>
+    <FormKit
         type="form"
         :actions="false"
         incomplete-message="Make sure all fields are filled"
@@ -68,14 +59,13 @@ const handleSubmit = async (dataForm) => {
         @submit="handleSubmit"
       >
         <FormKit
-          type="email"
-          name="email"
-          placeholder="Email"
+          type="password"
+          name="password"
+          placeholder="Your new password"
           placeholder-class="input:focus:placeholder-transparent"
-          validation="required | email"
+          validation="required"
           :validation-messages="{
-            required: 'Email is required',
-            email: 'Please enter a valid email address',
+            required: 'Password is required',
           }"
           validation-visibility="blur"
           input-class="pb-2 pl-2 mt-2 caret-yellow-400 bg-black border-b-2 border-white focus:outline-none w-[100%]  focus:placeholder-transparent"
@@ -84,65 +74,41 @@ const handleSubmit = async (dataForm) => {
         <FormKit
           outer-class="background"
           type="password"
-          name="password"
-          placeholder="Password"
+          name="repeatPassword"
+          placeholder="Repeat password"
           validation="required"
           :validation-messages="{
             required: 'Password is required',
           }"
           validation-visibility="blur"
-          v-model="passwordValidation"
-          @Change="handleChange"
           input-class="pb-2 pl-2 mt-7 caret-yellow-400 bg-black border-b-2 border-white focus:outline-none w-[100%] focus:placeholder-transparent"
           messages-class="text-red-500"
         />
         <input
           type="submit"
-          class="text-black text-xl mt-9 rounded-md p-2 tracking-wider font-medium cursor-pointer justify-items-center"
-          value="Login"
+          class="text-black text-xl mt-9 rounded-md p-2 tracking-wider font-medium cursor-pointer justify-items-end"
+          value="🚀 Ready 🚀"
         />
         <!-- <p v-if=""> {{  }}</p> -->
       </FormKit>
-
-      <span class="mt-4"
-        >Do not you have an account yet?
-        <RouterLink :to="{ name: 'register' }"
-          ><span class="link"
-            >Sign up here</span
-          ></RouterLink
-        >
-      </span>
-
-      <span class="mt-4">
-        <RouterLink :to="{ name: 'sendCode' }"
-          ><span class="link"
-            >Did you forget your password?</span
-          ></RouterLink
-        >
-      </span>
-      <span class="mt-4">or Login with </span>
-      <Authentication />
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
 .--container-- {
-  color: var(--title);
+ color: var(--title);
   background-color: black;
   z-index: 10000;
   animation: container 2s linear forwards;
-  position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   padding: 20px;
   border: solid 2px var(--border);
   border-radius: 15px;
-  width: 40%;
-  font-size: 18px;
-  
+  width: 50%;
+  font-size: 16px;
 
   @keyframes container {
     0% {
@@ -181,12 +147,21 @@ input[type="submit"]:disabled {
   background-color: #d4bf0489;
   color: #00000087;
 }
-.link{
-  text-decoration: underline;
-  font-size: 18px;
-  color: var(--details);
+
+input[type="button"] {
+  background-color: var(--details);
+  transition: 0.5s;
+  border: solid 1px var(--details)
 }
-.link:hover{
+
+input[type="button"]:hover {
+  background-color: var(--container);
   color: var(--title);
+  border: solid 1px var(--details);
+}
+
+input[type="button"]:disabled {
+  background-color: #d4bf0489;
+  color: #00000087;
 }
 </style>
