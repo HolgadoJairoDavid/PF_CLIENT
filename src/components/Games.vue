@@ -22,7 +22,7 @@ const openGame = async (name) => {
       group: userStore.user.group,
       isOwn: gameToStore.isOwn,
     })
-    console.log(ranking)
+   
   }
   router.push(`/game/${name}`)
 }

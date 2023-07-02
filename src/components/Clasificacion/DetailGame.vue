@@ -37,7 +37,7 @@ allUsers.value = [...data]
       {{ storeGame.game.name }} <span class="block text-yellow-300">{{ storeComment.average }}     ★ </span> 
     </h1>
     <img
-    :src="`../src/assets/img/${storeGame.game.image}`"
+    :src="storeGame.game.image"
     class="w-full h-1/3 object-cover"
     alt=""
     />
