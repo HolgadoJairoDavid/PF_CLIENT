@@ -147,7 +147,7 @@ let checkImage = user.image
 
         <div class="flex flex-col md:flex-row mt-5 justify-evenly items-center">
           <button
-            class="text-title text-lg mt-9 rounded-md p-2 tracking-wider font-bold cursor-pointer buttonUpload"
+            class="text-title text-lg mt-9 rounded-md p-2 tracking-wider font-bold cursor-pointer"
             @click="openUploadWidget"
           >
             Upload image
@@ -188,14 +188,14 @@ let checkImage = user.image
           </div>
         </div>
         <div class="flex flex-row justify-evenly mt-6">
-          <!-- <button
+          <button
             type="button"
             class="delete w-fit text-lg mt-2 p-2 px-3 bg-red-400 hover:bg-red-700 text-black text-center font-bold rounded-md"
             @click="redirectToProfile"
           >
         
             Cancel
-          </button> -->
+          </button>
           <input
             type="submit"
             class="text-black w-1/3 text-lg mt-2 rounded-md p-2 tracking-wider font-bold cursor-pointer"
