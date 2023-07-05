@@ -9,23 +9,23 @@ import { onMounted, ref } from "vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import Helpers from "../helpers";
+import FooterVue from "../components/Footer.vue";
 
 const store = useAccessStore();
 const router = useRouter();
 
 let user = ref({});
-const countries = ref([])
+const countries = ref([]);
 
 onMounted(async () => {
   if (!store.access) {
     router.push({ name: "login" });
     return;
   } else {
-    user = {...store.user}
-   
+    user = { ...store.user };
 
-    const {data: countriesData} = await ClienteService.getAllCountries()
-    countries.value = [...Helpers.beautifyCountries(countriesData)]
+    const { data: countriesData } = await ClienteService.getAllCountries();
+    countries.value = [...Helpers.beautifyCountries(countriesData)];
   }
 });
 
@@ -47,10 +47,7 @@ let uploadedImage = ref(store.user.image);
 const handleSubmit = async (dataForm) => {
   dataForm.image = uploadedImage.value;
   try {
-    const { data } = await ClienteService.updateUserById(
-      user._id,
-      dataForm
-    );
+    const { data } = await ClienteService.updateUserById(user._id, dataForm);
 
     store.updateProfile(data);
     router.push({ name: "profile" });
@@ -68,17 +65,18 @@ const redirectToProfile = () => {
   router.push({ name: "profile" });
 };
 
-const checkImage = user.image?.split("/").length;
+let checkImage = user.image
+  ? user.image.split("/").length
+  : store.user.image.split("/").length;
 </script>
 <template>
   <div
-    class="overflow-x-hidden h-screen w-screen flex items-center justify-center"
-  v-if="store.access"
-    >
+    class="overflow-x-hidden h-screen w-screen flex flex-col items-center justify-center"
+    v-if="store.access"
+  >
     <BackgroundParticles />
-    <div
-      class="--container-- rounded-xl border-yellow-200 bg-black mt-9 border-2 p-5 w-[50%] grid place-items-center"
-    >
+    <h1 class="text-title text-2xl mb-5 font-bold">EDIT MY PROFILE</h1>
+    <div class="--container--">
       <FormKit
         type="form"
         :actions="false"
@@ -98,7 +96,7 @@ const checkImage = user.image?.split("/").length;
             required: 'Name is required',
           }"
           validation-visibility="blur"
-          input-class="pb-2 mt-7 bg-black border-b-2 border-white focus:outline-none w-[100%] focus:placeholder-transparent"
+          input-class="pb-2 mt-7 bg-container border-b-2 border-border focus:outline-none w-[100%] focus:placeholder-transparent"
           messages-class="text-red-600"
         />
         <FormKit
@@ -112,7 +110,7 @@ const checkImage = user.image?.split("/").length;
             required: 'Last Name is required',
           }"
           validation-visibility="blur"
-          input-class="pb-2 mt-7 bg-black border-b-2 border-white focus:outline-none w-[100%] focus:placeholder-transparent"
+          input-class="pb-2 mt-7 bg-container border-b-2 border-border focus:outline-none w-[100%] focus:placeholder-transparent"
           messages-class="text-red-600"
         />
 
@@ -128,7 +126,7 @@ const checkImage = user.image?.split("/").length;
             required: 'Country is required',
           }"
           validation-visibility="blur"
-          input-class="pb-2 mt-7 bg-black border-b-2 border-white focus:outline-none w-[100%] focus:placeholder-transparent"
+          input-class="pb-2 mt-7 bg-container border-b-2 border-border focus:outline-none w-[100%] focus:placeholder-transparent"
           messages-class="text-red-600"
         />
         <FormKit
@@ -143,42 +141,64 @@ const checkImage = user.image?.split("/").length;
             required: 'Birthdate is required',
           }"
           validation-visibility="blur"
-          input-class="pb-2 mt-7 bg-black border-b-2 border-white focus:outline-none w-[100%] focus:placeholder-transparent"
+          input-class="pb-2 mt-7 bg-container border-b-2 border-border focus:outline-none w-[100%] focus:placeholder-transparent"
           messages-class="text-red-600"
         />
 
         <div class="flex flex-col md:flex-row mt-5 justify-evenly items-center">
-          <input
-            type="button"
-            class="text-black text-xl mt-9 rounded-md p-2 tracking-wider font-bold cursor-pointer justify-items-end"
+          <button
+            class="text-title text-lg mt-9 rounded-md p-2 tracking-wider font-bold cursor-pointer buttonUpload"
             @click="openUploadWidget()"
-            value="Update profile image"
-          />
+          >
+            Upload image <i class="fa-solid fa-cloud-arrow-up"></i>
+          </button>
 
-          <img
-            :src="user.image"
-            alt=""
-            v-if="checkImage > 2"
-            class="w-60 border border-yellow-400 rounded-full object-cover"
-          />
-          <CloudImage
-            :image-name="uploadedImage"
-            :key="uploadedImage"
-            v-if="checkImage === 2"
-            style="width: 150px; height: 150px"
-          />
+          <div v-if="uploadedImage">
+            <img
+              :src="user.image"
+              alt=""
+              v-if="checkImage > 2"
+              class="w-60 border border-border rounded-full object-cover"
+            />
+            <CloudImage
+              :image-name="uploadedImage"
+              :key="uploadedImage"
+              v-if="checkImage === 2"
+              style="
+                width: 150px;
+                height: 150px;
+                border-radius: 50%;
+                border: solid 2px var(--border);
+              "
+            />
+          </div>
+          <div v-else>
+            <img
+              :src="store.user.image"
+              alt=""
+              v-if="checkImage > 2"
+              class="w-60 border border-border rounded-full object-cover"
+            />
+            <CloudImage
+              :image-name="store.user.image"
+              :key="store.user.image"
+              v-else
+              style="width: 150px; height: 150px"
+            />
+          </div>
         </div>
         <div class="flex flex-row justify-evenly mt-6">
           <button
             type="button"
-            class="w-fit px-10 bg-red-400 hover:bg-red-700 text-black text-center font-bold rounded-lg"
+            class="delete w-fit text-lg mt-2 p-2 px-3 bg-red-400 hover:bg-red-700 text-black text-center font-bold rounded-md"
             @click="redirectToProfile"
           >
+        
             Cancel
           </button>
           <input
             type="submit"
-            class="text-black text-xl w-[50%] px-10 bg-yellow-400 hover:bg-yellow-700 rounded-md font-bold p-2 tracking-wider cursor-pointer justify-items-end"
+            class="text-black w-1/3 text-lg mt-2 rounded-md p-2 tracking-wider font-bold cursor-pointer"
             value="Update"
           />
         </div>
@@ -187,15 +207,23 @@ const checkImage = user.image?.split("/").length;
       <!-- La variable "uploadedImage" es la que tiene el id de la imagen que se busca en Cloudinary para mostrar, eso deberia ser lo que se mande en el form -->
     </div>
   </div>
+  <FooterVue />
 </template>
 
 <style lang="scss" scoped>
 .--container-- {
-  color: var(--content);
-  background-color: (--container);
-  z-index: 10000;
+  color: var(--title);
+  background-color: var(--container);
   z-index: 10000;
   animation: container 2s linear forwards;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  border: solid 2px var(--border);
+  border-radius: 15px;
+  width: 60%;
+  font-size: 16px;
 
   @keyframes container {
     0% {
@@ -221,30 +249,48 @@ const checkImage = user.image?.split("/").length;
 }
 
 input[type="submit"] {
-  background-color: var(--principal);
+  background-color: var(--details);
   transition: 0.5s;
+  border: solid 1px var(--border);
+  color: black;
 }
 
 input[type="submit"]:hover {
-  background-color: #ffef5c;
+  background-color: var(--border);
+  color: var(--container);
+  border: solid 1px var(--title);
 }
 
 input[type="submit"]:disabled {
-  background-color: #ffe6008c;
+  background-color: #d4bf0489;
   color: #00000087;
 }
 
-input[type="button"] {
-  background-color: var(--principal);
+.buttonUpload {
+  background-color: var(--details);
   transition: 0.5s;
+  border: solid 1px var(--border);
+  width: fit-content;
+  color: black;
 }
 
-input[type="button"]:hover {
-  background-color: #ffef5c;
+.buttonUpload:hover {
+  background-color: var(--border);
+  color: var(--container);
+  border: solid 1px var(--title);
 }
 
-input[type="button"]:disabled {
-  background-color: #ffe6008c;
+.buttonUpload:disabled {
+  background-color: #d4bf0489;
   color: #00000087;
+}
+.delete {
+  transition: 0.5s;
+  border: solid 1px var(--border);
+}
+.delete:hover {
+  background-color: var(--border);
+  color: var(--container);
+  border: solid 1px var(--title);
 }
 </style>

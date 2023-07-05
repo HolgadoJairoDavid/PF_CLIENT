@@ -29,7 +29,7 @@
 
 <style scoped>
     .star-rating {
-        color: white; 
+        color: var(--title); 
         font-size: 40px;
         display: flex;
         justify-content: center;
@@ -37,7 +37,7 @@
     }
 
     .star-rating :hover {
-        color: yellow
+        color: var(--details)
     }
 
     .estrellas {

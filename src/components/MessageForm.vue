@@ -4,10 +4,10 @@
   import { inject, onMounted, onUpdated, ref } from 'vue';
   import { watch } from 'vue';
   import socket from "./../lib/socket";
-
+  import CloudImage from "../components/CloudImage.vue";
   // const user = useSelector(store => store.user)
   /*  useEffect(() => {
-    console.log(user)
+
    },[user]) */
   // const [message, setMessage] = useState('')
   /* const { socket, currentRoom, setMessages, messages, privateMemberMsg } = useContext(AppContext) */
@@ -21,7 +21,6 @@
   const message = ref('') // necesita el v-model
   const div = ref('')
   const { 
-    // socket,
     currentRoom,
     setMessages,
     messages,
@@ -32,13 +31,16 @@
   const messageEndRef = ref(null) // necesita ref="input" en el elemento
   const scroll = ref(null)
   watch(currentRoom, () => {
-    scrollToBottom()
+    setTimeout(scrollToBottom,100) 
   })
 
+
   watch(store.user.newMessages,()=>{
+   
     if(store.user.newMessages[currentRoom.value]){
       newMessage.value = true
     }
+
   })
 
   const getFormatedDate = () => {
@@ -51,21 +53,16 @@
     return `${month}/${day}/${year}`
   }
 
+  
 
   const scrollToBottom = () => {
     newMessage.value = false
     store.user.newMessages[currentRoom.value] = 0
     messageEndRef.value?.scrollIntoView({behavior: 'smooth', block: 'end' })
   }
-
-  
-
-  
   const todayDate = getFormatedDate()
   
   const localMessages = ref({})
-
-
 
   socket.off('room-messages').on('room-messages', (roomMessages) => {
     localMessages.value = roomMessages
@@ -74,7 +71,6 @@
     }
 
   })
-
 
   const handleScroll = ()=>{
     if(scroll.value.scrollTop>scrollPix.value){
@@ -86,7 +82,7 @@
   onMounted(() => {
     setTimeout(()=>{
       messageEndRef.value.scrollIntoView({behavior: 'smooth', block: 'end' })
-    }, 500)
+    }, 1000)
     setMessages(localMessages.value)
     scrollPix.value = scroll.value.scrollTop
   })
@@ -120,8 +116,8 @@
 </script>
 
 <template>
-  <div class='messages-output' @scroll="handleScroll" ref="scroll">
 
+  <div class='messages-output' @scroll="handleScroll" ref="scroll">
 
         <!-- { 
           user && !privateMemberMsg?._id 
@@ -147,11 +143,23 @@
             <div v-for="msg in message.messagesByDate">
               <div 
               :class="[msg.from.email === store.user.email ? 'me' : 'others']"
-              >                
-              
-              <p class="name"> 
-                {{ msg.from._id === store.user._id ? '' : msg.from.name }}
-              </p>
+              >
+              <div v-if="msg.from._id !== store.user._id" class="imgname">
+                <CloudImage class="photo"
+                  :imageName="msg.from.image"
+                  :key="msg.from.image"
+                  v-if="!msg.from.image.includes('google')"
+                />
+                <img 
+                  :src="msg.from.image"
+                  alt=""
+                  v-if="msg.from.image.includes('google')"
+                  class="photo"
+                />
+                <p class="name"> 
+                  {{ msg.from._id === store.user._id ? '' : msg.from.name }}
+                </p>
+              </div>             
                 <div class="message-inner ">
                   <div> <!-- Debe ser flex -->
 
@@ -201,22 +209,21 @@
         <!-- :disabled="[!store.user]" -->
         <div class="boxInput" >
           <button class="bajar" v-if="newMessage" @click="scrollToBottom">{{ store.user.newMessages[currentRoom] }}  🔽</button>
-          <form @submit.prevent="handleSubmit" class="flex flex-row  sticky bottom-0 w-full" >
-            
+          <form @submit.prevent="handleSubmit" class="form" >
             <input 
-            class="text-white bg-black border border-yellow-400 m-2 w-3/4 pl-2 rounded-l-lg"
+            class="input"
             type="text" 
             placeholder="Your message"
             v-model="message"
             >
             <button
             
-            class="text-black m-2 p-2 bg-yellow-400 rounded-e-lg"
+            class="bt"
             @click.prevent="handleSubmit"
             
                 type="submit"
                 >
-                Send
+                <i class="fa-regular fa-paper-plane"></i>
               </button>
             </form>
             
@@ -250,10 +257,24 @@
 <style scoped>
 
 .messages-output {
+  background-color: var(--container);
   min-height: 100%;
   overflow-y: scroll;
   width: 350px;
-  height: 70vh;
+  height: 75vh;
+}
+
+.photo{
+  border: 2px solid var(--container);
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+}
+
+.imgname{
+  display: flex;
+  justify-content: left;
+  align-items: center;
 }
 
 .messageEnd {
@@ -266,7 +287,7 @@
     height: 0;
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;
-    border-top: 15px solid #F2E500;
+    border-top: 15px solid var(--details);
   }
 
 
@@ -276,7 +297,21 @@
     height: 0;
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;
-    border-top: 15px solid #EDEDED;
+    border-top: 15px solid var(--title);
+  }
+
+  .bt{
+    color: #111827;
+    background-color: var(--details);
+    width: 50px;
+    height: 40px;
+    margin-left: 5px;
+    border-radius: 0 10px 10px 0;
+  }
+
+  .bt:hover{
+    background-color: #111827;
+    color: #e2e8f0;
   }
 
   .fecha{
@@ -296,10 +331,11 @@
   align-items: center;
   text-align: center;
   height: 30px;
-  background-color: #F2E500;
+  background-color: var(--details);
 }
 
 .name{
+  margin-left: 5px;
   font-size: 13px;
 }
 
@@ -332,12 +368,12 @@
   margin-top: 10px;
   margin-left: 35px;
   width: 300px;
-  background-color: #F2E500;
+  background-color: var(--details);
   border: none;
 }
 
 .others{
-  color: #111827;
+  color: var(--container);
   padding: 2px;
   height: auto;
   word-break: break-word;
@@ -347,19 +383,38 @@
   margin-top: 10px;
   margin-left: 10px;
   width: 300px;
-  background-color: #EDEDED;
+  background-color: var(--title);
   border: none;
 }
 
 .chatbox{
   border-radius: 15px 15px 0px 15px;
-  background-color: #111827;
+  background-color: var(--container);
 }
 
 .time{
   margin-left: 240px;
   font-size: 12px;
   margin-bottom: 3px;
+}
+
+/* text-white bg-black border border-yellow-400 m-2 w-3/4 pl-2 rounded-l-lg */
+.input{
+  color: var(--title);
+  background-color: var(--container);
+  border: 2px solid var(--details);
+  border-radius: 10px 0 0 10px;
+  height: 40px;
+  width: 280px;
+}
+
+.message{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 30px;
+  background-color: #F2E500;
 }
 
 </style>

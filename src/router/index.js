@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from "vue-router";
 import Landing from "../views/LandingView.vue";
 // import About from "../views/AboutView.vue";
 
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -22,14 +21,14 @@ const router = createRouter({
       component: () => import("../views/Register.vue"),
     },
     {
-      path: '/profile',
-      name: 'profile',
-      component: () => import('../views/ProfileView.vue')
+      path: "/profile",
+      name: "profile",
+      component: () => import("../views/ProfileView.vue"),
     },
     {
-      path: '/home',
-      name: 'home',
-      component: () => import('../views/Home.vue')
+      path: "/home",
+      name: "home",
+      component: () => import("../views/Home.vue"),
     },
     {
       path: "/about",
@@ -45,7 +44,7 @@ const router = createRouter({
       path: "/complete-Profile",
       name: "completeProfile",
       component: () => import("../views/CompleteProfileView.vue"),
-      props: true
+      props: true,
     },
     {
       path: "/admin",
@@ -55,12 +54,43 @@ const router = createRouter({
     {
       path: "/updateUser",
       name: "updateUser",
-      component: ()=> import("../views/UpdateUserView.vue")
+      component: () => import("../views/UpdateUserView.vue"),
     },
     {
       path: "/admin/student-detail/:id",
       name: "studentView",
-      component: ()=> import("../views/AdminStudentView.vue")
+      component: () => import("../views/AdminStudentView.vue"),
+    },
+    {
+      path: "/game/:name",
+      name: "game",
+      component: () => import("../views/GameView.vue"),
+    },
+    {
+      path: "/game",
+      name: "detailGame",
+      component: () => import("../views/DetailGame.vue"),
+    },
+    {
+      path: "/deleted/:id",
+      name: "deleted",
+      component: () => import("../views/DeletedView.vue"),
+      params: true,
+    },
+    {
+      path: "/recover",
+      name: "recover",
+      component: () => import("../views/RecoverAccountView.vue"),
+    },
+    {
+      path: "/sendCode",
+      name: "sendCode",
+      component: () => import("../views/PasswordCodeView.vue"),
+    },
+    {
+      path: "/setNewPassword",
+      name: "setNewPassword",
+      component: () => import("../views/PasswordSetView.vue"),
     },
     {
       path: "/game/:name",
@@ -68,31 +98,31 @@ const router = createRouter({
       component: ()=> import("../views/GameView.vue")
     }, 
     {
-      path: "/game",
-      name: "detailGame",
-      component: () => import("../views/DetailGame.vue")
+      path: "/banned",
+      name: "banned",
+      component: () => import("../views/BannedView.vue"),
     },
     {
-      path: "/deleted/:id",
-      name: "deleted",
-      component: ()=> import("../views/DeletedView.vue"),
-      params: true
+      path: "/videocall",
+      name: "videocall",
+      component: () => import("../views/VideocallView.vue")
     },
     {
-      path: "/recover",
-      name: "recover",
-      component: ()=> import("../views/RecoverAccountView.vue")
+      path: '/:pathMatch(.*)',
+      name: "404",
+      component: () => import("../views/404View.vue")
     },
     {
-      path: "/sendCode",
-      name: "sendCode",
-      component: () => import("../views/PasswordCodeView.vue")
+      path: "/videocall",
+      name: "videocall",
+      component: () => import("../views/VideocallView.vue")
     },
     {
-      path: "/setNewPassword",
-      name: "setNewPassword",
-      component: () => import("../views/PasswordSetView.vue")
-    },
+      path: '/:pathMatch(.*)',
+      name: "404",
+      component: () => import("../views/404View.vue")
+    }
+
   ],
 });
 

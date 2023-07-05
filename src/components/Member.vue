@@ -17,31 +17,30 @@ const isOnline = computed(() => {
 </script>
 
 <template>
+
   <div class="member">
     <div
 
       :class="member.status === 'online'  || member._id === user._id? 'green' : 'red'"
     >
-      <!-- {{ member?.status }} {{ " " }} -->
     </div>
+
     <span class="p1- m-1">{{ member?.name }}</span>
-    <span class="text-yellow-300 p-1 m-1"
+    <span 
       >{{ member._id === user._id ? " ( You )" : "" }}
     </span>
-    <span class="text-white"
+    <span 
       >{{ member.status === "online" || member._id === user._id? "(Online)" : "(Offline)" }}
-    </span>
-    <span>
-      {{ newMessages }}
     </span>
   </div>
 </template>
-
 <style lang="scss" scoped>
 .green{
   width: 10px;
   height: 10px;
+
   background-color: rgb(39, 233, 0);
+
   border-radius: 50%;
 }
 
@@ -59,6 +58,6 @@ const isOnline = computed(() => {
   flex-direction: row;
   align-items: center;
   text-align: center;
-  color: white;
+  color: var(--title);
 }
 </style>

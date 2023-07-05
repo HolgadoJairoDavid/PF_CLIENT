@@ -5,7 +5,7 @@ import HenryMoonWelcome from "../components/UI/HenryMoonWelcome.vue";
 import Slide from "../components/Slide.vue";
 import BackgroundParticles from "../components/UI/BackgroundParticles.vue";
 // import lets_go from "../assets/UI/sounds_effects/let's_go.mp3";
-
+import FooterVue from "../components/Footer.vue";
 const giveClass = ref(false);
 const updateClass = () => {
   setTimeout(() => {
@@ -39,6 +39,8 @@ updateClass();
       </div>
     </div>
   </div>
+  <FooterVue />
+
 </template>
 
 <style lang="scss" scoped>

@@ -1,9 +1,10 @@
 <script setup>
 import { FormKit } from "@formkit/vue";
-import { useRouter } from "vue-router";
+import { loadRouteLocation, useRouter } from "vue-router";
 import ClienteService from "../services/ClienteService";
 import BackgroundParticles from "../components/UI/BackgroundParticles.vue";
 import { useAccessStore } from "../stores/userStore";
+import { useLoaderStore } from "../stores/loaderStore";
 import CloudImage from "../components/CloudImage.vue";
 import { ref } from "vue";
 import { toast } from "vue3-toastify";
@@ -14,7 +15,7 @@ const countries = ref([])
 import socket from "./../lib/socket";
 import { onMounted } from "vue";
 import Helpers from "../helpers";
-
+import FooterVue from "../components/Footer.vue";
 const widget = window.cloudinary.createUploadWidget(
   { cloud_name: "HenryMoon", upload_preset: "sm7kib26" },
   (error, result) => {
@@ -30,21 +31,32 @@ function openUploadWidget() {
 
 let uploadedImage = ref("Users/nx0xistql7jbamjxca5u");
 
+const loader = useLoaderStore()
+
 const handleSubmit = async (dataForm) => {
   // ANTES QUE NADA DEBEMOS REALIZAR LA CONSULTA
   dataForm.image = uploadedImage.value;
-  // dataForm.cohort = cohort.value;
   const create = ref(false);
-  ClienteService.findUserByEmail({ email: dataForm.email })
+  loader.setLoading(true)
+  await ClienteService.findUserByEmail({ email: dataForm.email })
     .then(async ({ data }) => {
       if(data.length) {
         if (data[0].isBanned) {
+          loader.setLoading(false)
           router.push({ name: "banned" });
           return;
         } else if (data[0].isDeleted) {
-          store.updateProfile(data[0])
+
+          store.updateProfile(dataForm)
+          loader.setLoading(false)          
+
           router.push({ name: "recover" });
           return;
+        } else if(!data[0].isBanned && !data[0].isDeleted){
+          loader.setLoading(false)
+          toast.warning("That user already exists", {
+            autoClose: 3000,
+          });
         }
       } else {
         create.value = true;
@@ -53,38 +65,35 @@ const handleSubmit = async (dataForm) => {
     .then(async () => {
       if (create.value) {
         try {
+          loader.setLoading(true)
           const { data } = await ClienteService.register(dataForm);
           if (data.access) {
-            //AUFER ESTÁ TRABAJANDO EN LAS OTRAS PROPIEDADES
             store.login(data.user);
             store.updateAdmin(dataForm);
             socket.emit("new-user");
+            loader.setLoading(false)
             router.push({ name: "home" });
           }
         } catch (error) {
-          toast.warning("That user already exists", {
+          loader.setLoading(false)
+          toast.warning("Wrong, sorry!", {
             autoClose: 3000,
           });
         }
       }
     });
+    loader.value = false
 };
 
 const cohorts = ref([])
 
 onMounted(async ()=> {
   const response = await ClienteService.getAllCohorts()
-  cohorts.value = ['---', ...response.data]
+  cohorts.value = [...response.data]
   
   const {data: countriesData} = await ClienteService.getAllCountries()
   countries.value = [...Helpers.beautifyCountries(countriesData)]
 })
-
-// Validaciones Cohorte
-/* const cohort = ref('');
-const validationError = ref(false);
-const validationErrorMessage = ref(''); */
-
 
 const validate_Cohort_Group = (cohort,group) => {
 
@@ -101,16 +110,19 @@ const validate_Cohort_Group = (cohort,group) => {
   } */
 }
 
-const groups = ref(['---'])
+const groups = ref([])
+const select_cohortReady= ref(false)
 
 const findGroup = async (e) => {
+  select_cohortReady.value = true
   if(e.target.value !== '---') {
     const {data} = await ClienteService.getAllGroups(e.target.value)
-    if(groups.value.lenth <= 1) {
+    if(groups.value.length <= 1) {
       groups.value = [...data]
     } else {
-      groups.value = ['---', ...data]
+      groups.value = [...data]
     }
+
   }
 }
 
@@ -121,13 +133,16 @@ const select_cohort = (value) => {
 const select_group = (value) => {
   return value !== '---'
 }
-
+const redirectToLogin = () => {
+  router.push({ name: "login" });
+};
 </script>
 <template>
   <div
-    class="overflow-x-hidden h-screen w-screen flex items-center justify-center"
+    class="overflow-x-hidden min-h-screen  flex flex-col items-center justify-center"
   >
     <BackgroundParticles />
+    <h1 class="text-title text-2xl mb-5 font-bold">REGISTER</h1>
     <div class="--container--">
       <FormKit
         type="form"
@@ -147,7 +162,7 @@ const select_group = (value) => {
             required: 'Name is required',
           }"
           validation-visibility="blur"
-          input-class="pb-2 mt-7 caret-yellow-400 bg-black border-b-2 border-white focus:outline-none w-[100%] focus:placeholder-transparent"
+          input-class="pb-2 mt-7 caret-yellow-400 bg-transparent border-b-2 border-white focus:outline-none w-[100%] focus:placeholder-transparent"
           messages-class="text-red-600"
         />
 
@@ -161,7 +176,7 @@ const select_group = (value) => {
             required: 'Last Name is required',
           }"
           validation-visibility="blur"
-          input-class="pb-2 mt-7 caret-yellow-400 bg-black border-b-2 border-white focus:outline-none w-[100%] focus:placeholder-transparent"
+          input-class="pb-2 mt-7 caret-yellow-400 bg-transparent border-b-2 border-white focus:outline-none w-[100%] focus:placeholder-transparent"
           messages-class="text-red-600"
         />
 
@@ -176,7 +191,7 @@ const select_group = (value) => {
             email: 'Please enter a valid email address',
           }"
           validation-visibility="blur"
-          input-class="pb-2 mt-7 caret-yellow-400 bg-black border-b-2 border-white focus:outline-none w-[100%] focus:placeholder-transparent"
+          input-class="pb-2 mt-7 caret-yellow-400 bg-transparent border-b-2 border-white focus:outline-none w-[100%] focus:placeholder-transparent"
           messages-class="text-red-600"
         />
         <FormKit
@@ -189,9 +204,7 @@ const select_group = (value) => {
             required: 'Password is required',
           }"
           validation-visibility="blur"
-          v-model="passwordValidation"
-          @Change="handleChange"
-          input-class="pb-2 mt-7 caret-yellow-400 bg-black border-b-2 border-white focus:outline-none w-[100%] focus:placeholder-transparent"
+          input-class="pb-2 mt-7 caret-yellow-400 bg-transparent border-b-2 border-white focus:outline-none w-[100%] focus:placeholder-transparent"
           messages-class="text-red-600"
         />
         <div class=" mt-2 flex flex-row justify-between items-center">
@@ -199,6 +212,7 @@ const select_group = (value) => {
             <FormKit
           type="select"
           name="country"
+          class="country"
           :options="countries"
           placeholder="Country"
           placeholder-class="input:focus:placeholder-transparent"
@@ -207,7 +221,7 @@ const select_group = (value) => {
             required: 'Country is required',
           }"
           validation-visibility="blur"
-          input-class="pb-2 mt-5  bg-black border-b-2 border-white focus:outline-none w-[100%] focus:placeholder-transparent"
+          input-class="pb-2 mt-5  bg-container border-b-2 border-white focus:outline-none w-[100%] focus:placeholder-transparent"
           messages-class="text-red-600"
         />
           </div>
@@ -222,10 +236,10 @@ const select_group = (value) => {
             required: 'Birthdate is required',
           }"
           validation-visibility="blur"
-          input-class="pb-2 mt-5 bg-black border-b-2 border-white focus:outline-none w-[100%] focus:placeholder-transparent"
+          input-class="pb-2 mt-5 bg-container border-b-2 border-white focus:outline-none w-[100%] focus:placeholder-transparent"
           messages-class="text-red-600"
         >
-        <i class="fa-regular fa-calendar fa-sm" style="color: #f2e600;"></i>
+        <i class="calendar-icon fa-regular fa-calendar fa-sm text-red-500"></i>
         </FormKit>
           </div>
         </div>    
@@ -233,30 +247,15 @@ const select_group = (value) => {
 
         <!-- ! /////////////////////// -->
 
-        <!-- <FormKit
-          type="text"
-          name="cohort"
-          placeholder="Cohorte, example: 37a"
-          placeholder-class="input:focus:placeholder-transparent"
-          validation="required"
-          :validation-messages="{
-            required: 'Cohorte is required',
-            format: 'Formato de cohorte inválido. Por favor, ingresa 2 números seguidos de una letra.'
-          }"
-          @blur="validateCohort"
-          validation-visibility="blur"
-          input-class="pb-2 mt-7 bg-black border-b-2 border-white focus:outline-none w-[100%] focus:placeholder-transparent"
-          messages-class="text-red-600"
-        /> -->
-
         <div class="mt-2 flex flex-row justify-around items-center">
           <div>
             <FormKit
               type="select"
-              label="Cohort :"
               name="cohort"
-              validation="select_cohort"
-              validation-visibility="live"
+              label="Cohort :"
+              placeholder="Cohort"
+              validation="required"
+              validation-visibility="blur"
               :validation-rules="{ select_cohort }"
               :validation-messages="{
                 select_cohort: 'Cohort is required'
@@ -265,20 +264,22 @@ const select_group = (value) => {
               :classes="{
                 outer: 'w-32 text-center flex flex-col items-center',
                 inner: 'mt-2 shadow border border-slate-600 appearance-none rounded py-2 px-2 w-24',
-                input: 'w-18 bg-black text-white border-none p-0 focus:outline-none focus:border-transparent',
+                input: 'w-18 bg-container text-white border-none p-0 focus:outline-none focus:border-transparent',
                 messages: 'text-red-600 pt-3'
               }"
               :options="cohorts"
-              @click="findGroup"
+              @change="findGroup"
             />
           </div>
           <div>
             <FormKit
+            v-if="select_cohortReady"
               type="select"
               label="Group :"
               name="group"
-              validation="select_group"          
-              validation-visibility="live"
+              placeholder="Group"
+              validation="required"          
+              validation-visibility="blur"
               :validation-rules="{ select_group }"
               :validation-messages="{
                 select_group: 'Group is required'
@@ -286,32 +287,13 @@ const select_group = (value) => {
               :classes="{
                 outer: 'w-32 text-center flex flex-col items-center',
                 inner: 'mt-2 shadow border border-slate-600 appearance-none rounded py-2 px-2 w-24',
-                input: 'w-18 bg-black text-white border-none p-0 focus:outline-none focus:border-transparent',
+                input: 'w-18 bg-container text-white border-none p-0 focus:outline-none focus:border-transparent',
                 messages: 'text-red-600 pt-3'
               }"
               :options="groups"
             />
           </div>
         </div>
-        <!-- <FormKit
-          type="number"
-          min="1"
-          name="group"
-          placeholder="Group, example: 11"
-          placeholder-class="input:focus:placeholder-transparent"
-          validation="required"
-          :validation-messages="{
-            required: 'Group is required',
-          }"
-          validation-visibility="blur"
-          input-class="pb-2 mt-7 bg-black border-b-2 border-white focus:outline-none w-[100%] focus:placeholder-transparent"
-          messages-class="text-red-600"
-        /> -->
-
-        <!-- ! /////////////////////// -->
-
-        
-
         <div class="flex flex-col md:flex-row mt-3 justify-evenly items-center">
           <input
             type="button"
@@ -325,11 +307,21 @@ const select_group = (value) => {
             style="width: 120px; height: 120px; border-radius: 50%; border: solid 1px var(--border);"
           />
         </div>
-        <input
+        <div class="flex flex-row justify-evenly mt-6">
+          <button
+            type="button"
+            class="delete w-1/4 text-lg mt-2 p-2 bg-red-400 hover:bg-red-700 text-black text-center font-medium rounded-md"
+            @click="redirectToLogin"
+          >
+            Cancel
+          </button>
+          <input
           type="submit"
-          class="text-black bg- text-lg mt-2  rounded-md p-2 tracking-wider font-medium cursor-pointer"
+          class="text-black text-lg mt-2 rounded-md p-2 tracking-wider font-medium cursor-pointer"
           value="Register"
         />
+        </div>
+  
       </FormKit>
 
       <!-- La variable "uploadedImage" es la que tiene el id de la imagen que se busca en Cloudinary para mostrar, eso deberia ser lo que se mande en el form -->
@@ -344,12 +336,19 @@ const select_group = (value) => {
       </span>
     </div>
   </div>
+  <FooterVue />
 </template>
 
 <style lang="scss" scoped>
+
+.loader {
+  background-color: hsl(0 0% 0% / .6);
+  z-index: 10001;
+}
+
 .--container-- {
- color: var(--title);
-  background-color: black;
+  color: var(--title);
+  background-color: var(--container);
   z-index: 10000;
   animation: container 2s linear forwards;
   display: flex;
@@ -383,13 +382,14 @@ const select_group = (value) => {
 input[type="submit"] {
   background-color: var(--details);
   transition: 0.5s;
-  border: solid 1px var(--details);
+  border: solid 1px var(--border);
+  width: 60%;
 }
 
 input[type="submit"]:hover {
- background-color: var(--container);
-  color: var(--title);
-  border: solid 1px var(--details);
+  background-color: var(--border);
+  color: var(--container);
+  border: solid 1px var(--title);
 }
 
 input[type="submit"]:disabled {
@@ -400,13 +400,14 @@ background-color: #d4bf0489;
 input[type="button"] {
   background-color: var(--details);
   transition: 0.5s;
-  border: solid 1px var(--details);
+  border: solid 1px var(--border);
+  color: black; 
 }
 
 input[type="button"]:hover {
-  background-color: var(--container);
-  color: var(--title);
-  border: solid 1px var(--details);
+  background-color: var(--border);
+  color: var(--container);
+  border: solid 1px var(--title);
 }
 
 input[type="button"]:disabled {
@@ -420,6 +421,15 @@ input[type="button"]:disabled {
 }
 .link:hover{
   color: var(--title);
+}
+.delete{
+  transition: 0.5s;
+  border: solid 1px var(--border);
+}
+.delete:hover {
+ background-color: var(--border);
+  color: var(--container);
+  border: solid 1px var(--title);
 }
 .calendar-icon {
   color: red;

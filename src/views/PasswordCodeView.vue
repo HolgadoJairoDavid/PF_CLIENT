@@ -11,10 +11,8 @@ import "vue3-toastify/dist/index.css";
 const store = useAccessStore();
 import socket from "./../lib/socket";
 import { ref } from "vue";
-
+import FooterVue from "../components/Footer.vue";
 const router = useRouter();
-
-
 
 function passCode() {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -66,16 +64,20 @@ const handleSubmit = async (dataForm) => {
     });
   }
 };
+const redirectToLogin = () => {
+  router.push({ name: "login" });
+};
 </script>
 <template>
     <div
-    class="h-screen w-screen flex items-center justify-center overflow-hidden"
+    class="h-screen w-screen flex flex-col items-center justify-center overflow-hidden"
   >
     <BackgroundParticles />
+    <h1 class="text-title text-2xl mb-5 font-bold">RESET YOUR PASSWORD</h1>
     <div
     class="--container--"
     >
-    <h1>Reset Your Password</h1>
+
     <FormKit
         type="form"
         :actions="false"
@@ -96,17 +98,24 @@ const handleSubmit = async (dataForm) => {
             email: 'Please enter a valid email address',
           }"
           validation-visibility="blur"
-          input-class="pb-2 pl-2 mt-2 caret-yellow-400 bg-black border-b-2 border-white focus:outline-none w-[100%]  focus:placeholder-transparent"
+          input-class="pb-2 pl-2 mt-2 caret-yellow-400 bg-transparent border-b-2 border-white focus:outline-none w-[100%]  focus:placeholder-transparent"
           messages-class="text-red-500 mt-2"
         />
-        <span>
+        <div class="flex flex-row justify-evenly mt-6">
+          <button
+            type="button"
+            class="delete w-[15%] text-lg mt-2 p-2 bg-red-400 hover:bg-red-700 text-black text-center font-medium rounded-md"
+            @click="redirectToLogin"
+          >
+            Cancel
+          </button>
             <input
           type="button"
-          class="text-black text-xl mt-9 rounded-md p-2 w-[100%] tracking-wider font-medium cursor-pointer"
+          class="text-black text-xl mt-2 rounded-md p-2 w-[70%] tracking-wider font-medium cursor-pointer"
           value="Send email"
          @click="handleCode"
         />
-        </span>
+        </div>
         <FormKit
           outer-class="background"
           type="text"
@@ -117,7 +126,7 @@ const handleSubmit = async (dataForm) => {
             required: 'Code is required',
           }"
           validation-visibility="blur"
-          input-class="pb-2 pl-2 mt-7 caret-yellow-400 bg-black border-b-2 border-white focus:outline-none w-[100%] focus:placeholder-transparent"
+          input-class="pb-2 pl-2 mt-7 caret-yellow-400 bg-transparent border-b-2 border-white focus:outline-none w-[100%] focus:placeholder-transparent"
           messages-class="text-red-500 mt-2"
         />
         <input
@@ -129,12 +138,13 @@ const handleSubmit = async (dataForm) => {
       </FormKit>
     </div>
   </div>
+  <FooterVue />
 </template>
 
 <style lang="scss" scoped>
 .--container-- {
   color: var(--title);
-  background-color: black;
+  background-color: var(--container);
   z-index: 10000;
   animation: container 2s linear forwards;
   display: flex;
@@ -169,13 +179,13 @@ const handleSubmit = async (dataForm) => {
 input[type="submit"] {
   background-color: var(--details);
   transition: 0.5s;
-  border: solid 1px var(--details);
+  border: solid 1px var(--border);
 }
 
 input[type="submit"]:hover {
-  background-color: var(--container);
-  color: var(--title);
-  border: solid 1px var(--details);
+  background-color: var(--border);
+  color: var(--container);
+  border: solid 1px var(--title);
 }
 
 input[type="submit"]:disabled {
@@ -190,13 +200,22 @@ input[type="button"] {
 }
 
 input[type="button"]:hover {
-  background-color: var(--container);
-  color: var(--title);
-  border: solid 1px var(--details)
+  background-color: var(--border);
+  color: var(--container);
+  border: solid 1px var(--title);
 }
 
 input[type="button"]:disabled {
   background-color: #d4bf0489;
   color: #00000087;
+}
+.delete{
+  transition: 0.5s;
+  border: solid 1px var(--border);
+}
+.delete:hover {
+ background-color: var(--border);
+  color: var(--container);
+  border: solid 1px var(--title);
 }
 </style>

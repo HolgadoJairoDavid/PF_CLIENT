@@ -87,7 +87,6 @@ export const useAccessStore = defineStore("access", () => {
       admin.value = true;
       ClienteService.getAllUsers()
         .then(({ data }) => storeOfUsers.uploadUsers(data))
-        .catch((error) => console.log(error));
     }
   };
 

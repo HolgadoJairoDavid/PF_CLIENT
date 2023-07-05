@@ -8,7 +8,9 @@ export const useComments = defineStore("comments", () => {
 const average = ref(0)
   const uploadComments = (data) => {
     comments.value = data.comments;
-    average.value = data.average !== 'NaN' ? data.average : 0
+    if (data.average) {
+      average.value = data.average !== 'NaN' ? data.average : 0
+    }
    
   };
   watch(comments, ()=> {

@@ -11,7 +11,7 @@ import image8 from "../assets/img/slides/9.svg";
 </script>
 
 <template>
-  <div class="slide bg-red-700">
+  <div class="slide ">
     <img class="absolute flex z-99 animate-1" :src="image" />
     <img class="absolute flex z-98 animate-2" :src="image1" />
     <img class="absolute flex z-97 animate-3" :src="image2" />

@@ -20,7 +20,6 @@ const playGame = async (id) => {
       group: userStore.user.group,
       isOwn: storeGame.game.isOwn,
     })
-    console.log(ranking)
   }
   router.push(`/game/${id}`);
 }
@@ -32,59 +31,85 @@ allUsers.value = [...data]
 </script>
 
 <template>
+
+  <div class="flex flex-col items-center justify-center w-full h-fit p-2 ">
+
   <div class="container">
     <h1>
-      {{ storeGame.game.name }} <span class="block text-yellow-300">{{ storeComment.average }}     ★ </span> 
+      {{ storeGame.game.name }} <span class="block ">{{ storeComment.average }}     ★ </span> 
     </h1>
     <img
     :src="storeGame.game.image"
-    class="w-full h-1/3 object-cover"
-    alt=""
+    class="w-[90%] h-1/2 object-cover border border-border"
+    alt="game"
     />
     <p>
       {{ storeGame.game.description }}
     </p>
-    <button class="bg-yellow-300 p-3 m-3 rounded-md text-black font-bold w-[150px] text-2xl hover:bg-green-800 hover:text-white"
+    <button class="bg-details p-3 m-3 rounded-md text-black font-bold w-[100px] text-xl hover:bg-green-800 hover:text-white"
       @click="playGame(storeGame.game._id)">PLAY</button>
   </div>
   <div
-      class="text-white text-xl m-3 p-3 self-start border border-yellow-400 bg-black text-center"
-      v-if="storeGame.game.isOwn"
+        class="points-container"
+        v-if="storeGame.game.isOwn && allUsers.length > 0"
     >
-      <h2>Podium</h2>
-      <ul>
-        <li v-for="user in allUsers" :key="user.id">
-          {{ user.user[0].name }} - Puntaje: {{ user.total }}
-        </li>
+      <h2>GAME PODIUM</h2>
+      <ul class="w-full p-3">
+        <div class="w-full flex flex-row justify-between m-1 row-color" v-for="(user, i) in allUsers" :key="user.id" :class="{ 'highlighted-user': user.user[0].name === userStore.user.name }">
+          {{ i + 1 }}. {{ user.user[0].name }} <span>Score: {{ user.total }}</span>
+        </div>
       </ul>
     </div>
+        
+  </div>
+
 </template>
 
 <style scoped>
+
 .container {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  background-color: var(--container);
   align-items: center;
-  width: 50%;
-  height: fit-content;
+  width: 90%;
+  height: 100%;
   padding: 5px;
-  margin: 10px;
-  border: solid 1px yellow;
+  border: solid 1px var(--border);
+  border-radius:10px;
 }
 .container h1{
   text-align: center;
-  color: white;
-  font-size: xx-large;
-  margin: 10px;
+  color: var(--title);
+  font-size: x-large;
   padding: 5px;
+  font-weight: bold;
 }
 .container p{
   text-align: justify;
-  color: white;
+  color: var(--title);
   font-size:larger;
   margin: 10px;
   padding: 5px;
 }
-
+.points-container {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: var(--title);
+  width: 90%;
+  height: fit-content;
+  margin: 5px;
+  padding: 5px;
+  background-color: var(--container);
+  border-radius:10px;
+  font-weight: bold;
+  border: solid 1px var(--border);
+}
+.highlighted-user {
+  color: var(--details);
+}
 </style>

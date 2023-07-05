@@ -9,6 +9,7 @@ import welcome from "../assets/img/HenryMoon.svg";
 import { useAccessStore } from "../stores/userStore";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
+import FooterVue from "../components/Footer.vue";
 const store = useAccessStore();
 import socket from "./../lib/socket";
 
@@ -43,13 +44,14 @@ const handleSubmit = async (dataForm) => {
 </script>
 <template>
     <div
-    class="h-screen w-screen flex items-center justify-center overflow-hidden"
+    class="h-screen w-screen flex flex-col items-center justify-center overflow-hidden"
   >
     <BackgroundParticles />
+    <h1 class="text-title text-2xl mb-5 font-bold">NEW PASSWORD</h1>
     <div
     class="--container--"
     >
-    <h1>New password</h1>
+
     <FormKit
         type="form"
         :actions="false"
@@ -68,7 +70,7 @@ const handleSubmit = async (dataForm) => {
             required: 'Password is required',
           }"
           validation-visibility="blur"
-          input-class="pb-2 pl-2 mt-2 caret-yellow-400 bg-black border-b-2 border-white focus:outline-none w-[100%]  focus:placeholder-transparent"
+          input-class="pb-2 pl-2 mt-2 caret-yellow-400 bg-container border-b-2 border-white focus:outline-none w-[100%]  focus:placeholder-transparent"
           messages-class="text-red-500"
         />
         <FormKit
@@ -81,24 +83,25 @@ const handleSubmit = async (dataForm) => {
             required: 'Password is required',
           }"
           validation-visibility="blur"
-          input-class="pb-2 pl-2 mt-7 caret-yellow-400 bg-black border-b-2 border-white focus:outline-none w-[100%] focus:placeholder-transparent"
+          input-class="pb-2 pl-2 mt-7 caret-yellow-400 bg-container border-b-2 border-white focus:outline-none w-[100%] focus:placeholder-transparent"
           messages-class="text-red-500"
         />
         <input
           type="submit"
           class="text-black text-xl mt-9 rounded-md p-2 tracking-wider font-medium cursor-pointer justify-items-end"
-          value="🚀 Ready 🚀"
+          value="Ready 🚀"
         />
         <!-- <p v-if=""> {{  }}</p> -->
       </FormKit>
     </div>
   </div>
+  <FooterVue />
 </template>
 
 <style lang="scss" scoped>
 .--container-- {
  color: var(--title);
-  background-color: black;
+  background-color: var(--container);
   z-index: 10000;
   animation: container 2s linear forwards;
   display: flex;
@@ -108,7 +111,7 @@ const handleSubmit = async (dataForm) => {
   border: solid 2px var(--border);
   border-radius: 15px;
   width: 50%;
-  font-size: 16px;
+  font-size: 20px;
 
   @keyframes container {
     0% {
@@ -134,13 +137,13 @@ const handleSubmit = async (dataForm) => {
 input[type="submit"] {
   background-color: var(--details);
   transition: 0.5s;
-  border: solid 1px var(--details);
+  border: solid 1px var(--border);
 }
 
 input[type="submit"]:hover {
-  background-color: var(--container);
-  color: var(--title);
-  border: solid 1px var(--details);
+  background-color: var(--border);
+  color: var(--container);
+  border: solid 1px var(--title);
 }
 
 input[type="submit"]:disabled {
@@ -155,9 +158,9 @@ input[type="button"] {
 }
 
 input[type="button"]:hover {
-  background-color: var(--container);
-  color: var(--title);
-  border: solid 1px var(--details);
+  background-color: var(--border);
+  color: var(--container);
+  border: solid 1px var(--title)
 }
 
 input[type="button"]:disabled {

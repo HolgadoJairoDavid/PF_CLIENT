@@ -3,7 +3,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { onMounted, ref } from 'vue';
 import ClienteService from "../services/ClienteService";
 import { useAccessStore } from "../stores/userStore";
-
+import FooterVue from "../components/Footer.vue";
 const store = useAccessStore();
 const counter = ref(7)
 const router = useRouter()
@@ -43,6 +43,7 @@ if (counter.value >= 1) {
         </button>
         </div>
 </div>
+<FooterVue />
 </template>
 
 <style lang="scss" scoped>

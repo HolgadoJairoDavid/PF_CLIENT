@@ -10,27 +10,6 @@ import { ref } from 'vue';
 
   const store = useAccessStore()
   const memberName = ref('')
-  // const dispatch = useDispatch()
-  // const user = useSelector(store => store.user)
-  /* const { 
-    socket, 
-    setMembers, 
-    members, 
-    setCurrentRoom, 
-    setRooms,
-    privateMemberMsg,
-    rooms,
-    setPrivateMemberMsg,
-    currentRoom
-  } = useContext(AppContext) */
-  /* useEffect(() => {
-    if(user) {
-      setCurrentRoom('general')
-      getRooms()
-      socket.emit('join-room', 'general')
-      socket.emit('new-user')
-    }
-  },[]) */
 
   const { 
     // socket,
@@ -48,7 +27,6 @@ import { ref } from 'vue';
   const viewMembers = ref(false)
   const joinRoom = (room, isPublic = true) => {
     
-    console.log(room)
 
     if(isPublic){
       memberName.value = ''
@@ -89,7 +67,7 @@ import { ref } from 'vue';
 
   const getRooms = async () => {
     const response = await fetch(
-      'https://henrymoonback.onrender.com/chat/rooms',
+      'https://henrymoon.onrender.com/chat/rooms',
       {
         method: "GET",
         headers: {"Content-type": "application/json;charset=UTF-8"}
@@ -146,7 +124,9 @@ import { ref } from 'vue';
     />
   </div>
   <div>
+
     <div class="title">Rooms</div>
+
     <div class="box">
       <Room
         v-for="room in rooms"
@@ -156,11 +136,13 @@ import { ref } from 'vue';
         @click="joinRoom(room)"
       />
     </div>
+
     <div  v-if=" memberName !== ''" class="name">
       <span >
         Chat con: {{ memberName }}
       </span>
     </div>
+
   </div>
 
 </template>
@@ -173,33 +155,37 @@ import { ref } from 'vue';
     min-height: 100%;
   }
   .box{
+
   width: 350px;
-  border-bottom: 8px solid #F2E500;
-  color: white;
+  border-bottom: 8px solid var(--details);
+  color: var(--title);
   height: 40px;
-  background-color: #111827;
+  background-color: var(--container);
+
   display: flex;
   flex-direction: row;
   align-items: center;
   text-align: center;
+
   justify-content: center;
 }
 
 .name{
-  background-color: #F2E500;
+  background-color: var(--details);
   width: 100%;
   height: 25px;
   display: flex;
   text-align: center;
   justify-content: center;
-  color: #111827;
+  color: var(--container);
 }
 .title{
   height: 30px;
-  color: white;
+  color: var(--title);
   align-items: center;
   text-align: center;
-  background-color: #111827;
+  background-color: var(--container);
+
   border-radius: 10px 10px 0px 0px;
 }
 
@@ -208,28 +194,32 @@ import { ref } from 'vue';
   justify-content: center;
   cursor: pointer;
   height: 30px;
-  color: white;
+
+  color: var(--title);
   align-items: center;
   text-align: center;
-  background-color: #111827;
+  background-color: var(--container);
   border-radius: 10px;
-  border: 2px solid #969696;
+  border: 2px solid var(--border);
+
 }
 
 .titlemem:hover{
   font-size: 18px;
 }
 
-
-
 .members{
+  height: 600px;
+  color: var(--title);
   width: 350px;
   position: absolute;
   z-index: 10;
-  border: 2px solid #969696;
+  border: 2px solid var(--border);
   margin-bottom: 10px;
   border-radius: 10px;
-  background-color: #111827;
+  background-color: var(--container);
+  overflow-y: scroll;
+
 }
 
 </style>

@@ -6,31 +6,26 @@ import socket from "../lib/socket";
 import Games from "../components/Games.vue";
 import Sidebar from "../components/Sidebar.vue";
 import MessageForm from "../components/MessageForm.vue";
-
+import FooterVue from "../components/Footer.vue";
+import Loading from "../components/UI/Loading.vue";
 const store = useAccessStore()
 const router = useRouter();
 const usersOnline = ref(["-"]);
 const usersOffline = ref(["-"]);
+const gameRes = ref(false)
 socket.emit("userData", store.user._id);
-
 onMounted(() => {
 
   if (!store.access) {
     router.push({ name: "login" });
   }
 
-  // console.log("userData ======================", usertemp);
   socket.emit("userData", store.user._id);
-  // socket.on("connect", (attempt) => {
-  //   socket.emit("userData", store);
-  // });
 
   socket.on("currentData", (users) => {
     usersOnline.value = users.filter(u => u.isConnected)
     usersOffline.value = users.filter(u => !u.isConnected)
-    // console.log("currentData =================================")
-    // console.log("usersOnline", usersOnline.value)
-    // console.log("usersOffline", usersOffline.value)
+
   });  
 
 });
@@ -42,15 +37,21 @@ onUnmounted(() => {
 });
 
 const openTwilio = () => {
-  const url = "https://video-app-4541-6703-dev.twil.io/";
+  const url = "https://henrymoon.vercel.app/videocall";
   window.open(url, "_blank");
 };
+
+const handleGameRes = ()=>{
+  gameRes.value = !gameRes.value
+}
 
 
 </script>
 <template>
   <div v-if="store.access" class="min-h-screen flex flex-col m-auto justify-around overflow-hidden">
-    <div class="h-full flex flex-col md:flex-row mt-24 font-bold p-3 m-3 overflow-hidden space-x-0 md:space-x-3">
+
+    <div class="ppal">
+      <button @click="handleGameRes" class="boton">VideoCall and Games</button>
     
       <!-- ! Panel de conectados -->
 
@@ -71,29 +72,21 @@ const openTwilio = () => {
 
       <!-- ! Sidebar chat -->
 
-      <div class="border border-yellow-400 md:w-2/3 w-full flex flex-col items-center m-2 p-2 text-white">
+      <div :class=" gameRes ? 'boxppalRes' :'boxppal'">
         <div class="center-div text-2xl">
           <button
-            class="w-fit h-14 m-3 px-10 bg-yellow-300 hover:bg-yellow-500 text-black text-center font-bold uppercase rounded-lg"
-            @click="openTwilio">Start VideoCall 📺</button>
+            class="videocall"
+            @click="openTwilio">Start VideoCall <i class="fa-solid fa-video "></i></button>
         </div>
-        <div class=" text-white  text-center text-2xl">
-          <h3>GAMES PANEL</h3>
-          <div class="m-2 p-2  flex flex-row md:flex-row items-center">
+
+        <div class="boxgame">
+          <h2 class="text">GAMES PANEL</h2>
+          <div class="games">
             <Games />
           </div>
         </div>
         
       </div>
-
-      <!-- ! Chat anterior -->
-
-      <!-- <div class="md:w-1/4 border border-gray-400 flex flex-col justify-between m-2 p-2 bg-gray-800">
-        <h1 class="text-white text-center text-2xl m-2 p-2 sticky top-0">CHAT</h1>
-        <div class="max-h-[90%] p-2">
-          <Chat />
-        </div>
-      </div> -->
       <div class="box">
         <div class="boxinter">
           <div class="slide">
@@ -103,24 +96,54 @@ const openTwilio = () => {
               <MessageForm />
             </div>
         </div>
+
       </div>
-      <!-- ! Nuevo Chat -->
     </div>
   </div>
+  <FooterVue />
 </template>
 
 
 <style lang="scss" scoped>
 
-/* .boxchat{
-  width: 350px;
-  height: 70vh;
-  overflow: auto;
-} */
+.boxgame{
+  width: 90%;
+ display: flex;
+ flex-direction: column;
+ text-align: center;
+}
+
+.ppal{
+  font-weight: bold;
+  margin-top: 40px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  padding: 30px;
+}
+
+.boxppal{
+  margin: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--details);
+  border-radius: 10px;
+  color: white;
+}
+
+.text{
+  font-size: 20px;
+
+}
 
 .box{
   border-radius: 10px;
 }
+
+
 
 .boxinter{
   position: relative;
@@ -128,6 +151,26 @@ const openTwilio = () => {
 .slide{
   border-radius: 10px;
 }
+
+.games{
+  margin: 10px;
+}
+
+.videocall{
+  margin: 10px;
+  background-color: var(--details);
+  width: 230px;
+  height: 45px;
+  color: #0f172a;
+  border-radius: 10px;
+}
+
+.videocall:hover{
+  background-color: #0f172a;
+  border: 2px solid white;
+  color: white;
+}
+
 @keyframes glow {
   from {
     box-shadow: 0px 0px 5px 5px #f5f5dc;
@@ -146,5 +189,54 @@ const openTwilio = () => {
   to {
     box-shadow: 0px 0px 10px 10px #f2e500;
   }
+}
+
+.boton{
+  display: none;
+  background-color: var(--container);
+  border: 2px solid var(--border);
+  width: 350px;
+  color: var(--title);
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.boxppalRes{
+  margin: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--details);
+  border-radius: 10px;
+  color: white;
+}
+
+@media (max-width: 680px) {
+  .ppal{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.boxppal{
+  display: none;
+}
+
+.boxppalRes{
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--details);
+  border-radius: 10px;
+  color: white;
+}
+
+.boton{
+  display: block;
+}
+
 }
 </style>

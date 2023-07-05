@@ -2,12 +2,17 @@
 
 import { RouterView } from "vue-router";
 import Navbar from "./components/Navbar.vue";
+import Loader from "./components/Loader.vue";
 import { useRoute } from "vue-router";
 import { useAccessStore } from "./stores/userStore";
+import { useLoaderStore } from "./stores/loaderStore";
 
 import { ref, provide } from 'vue' /* Para el nuevo chat */
+import { watch } from "vue";
 
 const store = useAccessStore();
+
+const loader = useLoaderStore();
 
 const route = useRoute();
 
@@ -15,7 +20,7 @@ const route = useRoute();
 
 
 
-  // const SOCKET_URL = 'http://localhost:5001'
+  //
   // const socket = io(SOCKET_URL)
 
   const rooms = ref([])
@@ -71,9 +76,17 @@ const routesToNavBar = [
   "donation",
   "studentView",
   "game",
-  "detailGame"
-];
+  "detailGame",
+  "videocall"
 
+];
+/* 
+const routes = [
+  { path: '/', component: Home },
+  // ... tus rutas existentes ...
+  { path: '/:pathMatch(.*)', redirect: '/' }, // Ruta por defecto para rutas no encontradas
+];
+ */
 </script>
 
 <template>
@@ -84,11 +97,25 @@ const routesToNavBar = [
       route.name !== 'landing'
     "
   />
+
   <RouterView />
+
   <!-- RouterView nos permite ver las rutas de nuestro proyecto -->
+
+  <div v-if="loader.loading" class="absolute top-0 right-0 left-0 bottom-0 flex justify-center items-center loader">
+    <Loader v-if="loader.loading" />
+  </div>
+ 
 </template>
 
 <style lang="scss">
+
+.loader {
+  z-index: 1000001;
+  width: 100%;
+  background-color: var(--body);
+}
+
 :root {
   --body: #020617;
   --container: #0f172a;
@@ -98,12 +125,14 @@ const routesToNavBar = [
 }
 
 :root[data-theme="light"]{
-  --body: #9f9f9f;
-  --container:#f8fafc;
+  --body: #8b8b8b;
+  --container:#e0e0e0;
   --border: #334155;
   --title: #0f172a;
   --details: #f2e600;
 }
+
+
 
 * {
   margin: 0;
@@ -119,7 +148,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--principal);
+  background-color: var(--details);
   border-radius: 5px;
 }
 </style>

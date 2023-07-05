@@ -14,19 +14,18 @@ const props = defineProps({
     }
   })
 
-watch(props, ()=>{
-  console.log(props.newMessages);
-})
+
 
 </script>
 
 <template>
   <div >
+
     <div :class="room === props.currentRoom ? 'selec': 'room'">
         <span class="notification"  v-if="room !== currentRoom && newMessages">
-           <div >
-             {{ newMessages }}
-            </div> 
+          <div >
+            {{ newMessages }}
+          </div> 
         </span>{{ room }}
     </div>
   </div>
@@ -36,15 +35,21 @@ watch(props, ()=>{
 
 <style lang="scss" scoped>
 .room{
+
+  color: var(--title);
   font-size: 15px;
+
   display: flex;
   align-items: center;
   text-align: center;
   justify-content: center;
+
   width: 90px;
-  height: 30px;
-  background-color: #111827;
+  height: 33px;
+  background-color: var(--container);
   border-radius: 5px 5px 0 0;
+  text-transform: capitalize;
+
 }
 
 .room:hover{
@@ -62,9 +67,9 @@ watch(props, ()=>{
   color: #111827;
   width: 80px;
   height: 45px;
-  background-color: #F2E500;
+  background-color: var(--details);
   border-radius: 8px 8px 0px 0px;
-  box-shadow: 3px -2px 5px rgb(0, 0, 0);
+  text-transform: capitalize;
 }
 
 .notification{
@@ -80,5 +85,6 @@ watch(props, ()=>{
   background-color: red;
   color: white;
 }
+
 
 </style>

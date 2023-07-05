@@ -61,10 +61,11 @@ const handleChange = () => {
       stars: starsFilter.value,
     };
     ClienteService.filterComments(dataComment).then(({ data }) => {
-        const newData = data.filter(
+      
+        const newData = data.comments.filter(
         (comment) => comment.game === storeGame.game.name
       );
-      storeComment.uploadComments(newData);
+      storeComment.uploadComments({comments: newData});
       savedComments.value = storeComment.comments;
     });
   }
@@ -79,6 +80,7 @@ const handleDelete= async (id) => {
 </script>
 
 <template>
+   <div class="flex flex-col items-center justify-center w-[60%] h-full m-2">
   <div class="container">
     <h1 class="classification">Classification</h1>
     <Stars :rating="classification" @update-rating="updateClassification" />
@@ -87,14 +89,14 @@ const handleDelete= async (id) => {
       <textarea v-model="comment" cols="50" rows="4" class="text"></textarea>
       <button 
       type="submit" 
-      class="w-fit h-14 m-3 px-10 bg-yellow-300 hover:bg-yellow-500 text-black text-center font-bold uppercase rounded-lg">Send</button>
+      class="w-14 h-14 m-3  bg-details border border-border hover:bg-border text-black text-center font-bold uppercase rounded-lg">Send</button>
     </form>
     <select
       @change="handleChange"
       v-model="starsFilter"
       name=""
       id=""
-      class="text-white text-lg w-fit bg-gray-800 p-3 m-5 rounded-md border border-yellow-300 hover:bg-yellow-400 hover:text-black"
+      class="text-title text-lg w-fit bg-container p-3 m-5 rounded-md border border-border hover:bg-border hover:text-black"
     >
       <option value="">All</option>
       <option value="1">1★</option>
@@ -110,7 +112,7 @@ const handleDelete= async (id) => {
       >
       <button
       v-if="savedComment.email === storeAccess.user.email"
-          class="bg-yellow-300 p-3 rounded-md text-black font-bold w-fit text-lg hover:bg-gray-800 hover:text-white"
+          class="bg-details p-2 rounded-md text-black font-bold w-fit text-lg hover:bg-container hover:text-title"
           @click="handleDelete(savedComment._id)"
         >
           Delete
@@ -130,28 +132,31 @@ const handleDelete= async (id) => {
       </div>
     </div>
   </div>
+</div>
 </template>
 
 <style scoped>
 .container {
   display: flex;
   flex-direction: column;
-  justify-content: space-aroun;
+  justify-content: space-around;
   align-items: center;
-  width: 40%;
-  height: fit-content;
+  width: 90%;
+
   padding: 5px;
-  margin: 10px;
-  border: solid 1px yellow;
+  border: solid 1px var(--border);
+  border-radius:10px;
+  background-color: var(--container);
 }
 .saved-comment {
-  border: 1px solid #ccc;
+  border: 1px solid var(--border);
   margin-top: 10px;
-  color: white;
+  color: var(--title);
+  background-color: var(--body);
 }
 
 .classification {
-  color: white;
+  color: var(--title);
   display: flex;
   justify-content: center;
   font-size: x-large;
@@ -160,24 +165,26 @@ const handleDelete= async (id) => {
 }
 
 .container-form {
-  color: white;
+  color: var(--title);
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 .text {
   margin: 5px;
-  color: black;
-  width: 70%;
+  color: var(--title);
+  width: 80%;
   font-size: 18px;
   font-weight: bold;
-  background-color: #969696;
-  border-radius: 20px;
+  background-color: var(--body);
+  border-radius: 15px;
   padding-left: 10px;
+  border: 1px solid var(--border);
 }
 
 
 .filled {
-  color: yellow;
+  color: var(--details);
 }
 </style>

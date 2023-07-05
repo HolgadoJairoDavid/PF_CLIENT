@@ -113,7 +113,7 @@ export default {
 
   // COUNTRIES
   getAllCountries() {
-    return countries.get("/countries");
+    return api.get("/country/all");
   },
   // para paypal
   getAllDonations(){

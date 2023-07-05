@@ -3,6 +3,7 @@ import BackgroundParticles from "../components/UI/BackgroundParticles.vue";
 import { useAccessStore } from "../stores/userStore";
 import { onMounted } from "vue";
 import { useRouter } from "vue-router";
+import FooterVue from "../components/Footer.vue";
 const store = useAccessStore();
 const router = useRouter();
 onMounted(() => {
@@ -13,28 +14,34 @@ onMounted(() => {
 </script>
 <template>
 
-  <div class="--container-- flex flex-col justify-evenly m-auto items-center overflow-x-hidden" v-if="store.access">
-    <BackgroundParticles />
-    <div class="flex flex-col  text-white w-3/4   mt-36  m-7 p-2 border border-yellow-300 rounded-2xl">
-      <h3 class="text-justify text-xl">
-        HenryMoon es un proyecto que busca proporcionar un espacio de relajación y distensión para los programadores. Su objetivo es ayudar a los estudiantes de SoyHenry a ecnotrar un equilibrio salusable entre el trabajo y el descanso para convertirse en programadores exitosos. HenryMoon simboliza la busqueda de la unión entre la paz mental y la relajación, invitando a dejar atrás las preocupaciones diarias y sumergirse en un universo donde todo es posible.
+  <div class="--container-- flex flex-col justify-evenly m-auto items-center min-h-screen" v-if="store.access">
+    <div class="ppal">
+    <div class="flex flex-col text-title w-[80%] bg-container m-7 p-2 border border-border rounded-2xl">
+      <h3 class="text-justify text-2xl">
+        HenryMoon es un proyecto que busca proporcionar un espacio de relajación y distensión para los programadores. Su
+        objetivo es ayudar a los estudiantes de SoyHenry a encontrar un equilibrio saludable entre el trabajo y el
+        descanso para convertirse en programadores exitosos. HenryMoon simboliza la busqueda de la unión entre la paz
+        mental y la relajación, invitando a dejar atrás las preocupaciones diarias y sumergirse en un universo donde todo
+        es posible.
+
       </h3>
 
     </div>
-    <h1 class="text-white text-center text-3xl mt-5 font-bold">DESARROLLADORES</h1>
+    <h1 class="text-title text-center text-3xl mt-3 font-bold">DESARROLLADORES</h1>
     <div class="--container-- m-3 p-2 flex flex-col md:flex-row">
-      <div class="md:w-1/2 flex flex-col p-2 m-2">
-        <div class=" m-1 border border-yellow-300  flex flex-col items-center md:flex-row rounded-2xl">
-          <div
-            class="border border-yellow-300 w-48 h-48 m-2 bg-white flex items-center justify-center rounded-full overflow-hidden">
-            <img src="../assets/img/Aufer.svg" alt="Aufer" class="w-full h-full object-cover" />
-          </div>
-          <div class="md:w-2/3 m-2 bg-black text-white">
+      <div class="md:w-1/2  flex flex-col p-2 m-2">
+        <div class=" m-1 border border-border  flex flex-col items-center md:flex-row rounded-2xl">
+          <div class="flex flex-col justify-evenly items-center md:flex-row bg-container  p-2 m-2 rounded-2xl">
+            <div
+              class="border border-border w-[200px] h-[200px] bg-white flex items-center justify-center rounded-full  overflow-hidden">
+              <img src="../assets/img/Aufer.svg" alt="Aufer" class="w-full h-full object-cover" />
+            </div>
+            <div class="md:w-2/3 m-2 bg-container text-title">
               <div class="containerNombreImagen">
                 <h3 class="text-xl mt-2 font-bold text-center">
                   Aufer Victoriano Contreras Cáceres
                 </h3>
-                <p class="text-l mt-4 text-justify">
+                <p class="text-l m-3 text-justify">
                   Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel
                   soluta inventore, corrupti dolorum ab excepturi? Incidunt dolore
                   molestiae, necessitatibus, ipsum in odio veniam delectus at
@@ -50,21 +57,21 @@ onMounted(() => {
                 </div>
               </div>
             </div>
-        </div>
-        <div class="border border-yellow-300 m-1 flex flex-col items-center md:flex-row rounded-2xl">
-          <!-- Poner los links hacia github y Linkdin -->
-          <!-- <a href="https://github.com/EAguirreChama" target="_blank"> -->
+          </div>
 
+        </div>
+        <div class="border border-border m-1 flex flex-col items-center md:flex-row rounded-2xl">
+          <div class="flex flex-col justify-evenly items-center md:flex-row bg-container p-2 m-2 rounded-2xl">
             <div
-              class="border border-yellow-300 w-48 h-48 m-2 bg-white flex items-center justify-center rounded-full overflow-hidden">
+              class="border border-border w-[200px] h-[200px] bg-white flex items-center justify-center rounded-full  overflow-hidden">
               <img src="../assets/img/Ernesto.svg" alt="Ernesto" class="w-full h-full object-cover" />
             </div>
-            <div class="md:w-2/3 m-2 bg-black text-white">
+            <div class="md:w-2/3 m-2 bg-container text-title">
               <div class="containerNombreImagen">
                 <h3 class="text-xl mt-2 font-bold text-center">
                   Ernesto Jesús Aguirre Chama
                 </h3>
-                <p class="text-l mt-4 text-justify">
+                <p class="text-l m-3 text-justify">
                   Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel
                   soluta inventore, corrupti dolorum ab excepturi? Incidunt dolore
                   molestiae, necessitatibus, ipsum in odio veniam delectus at
@@ -74,26 +81,27 @@ onMounted(() => {
                   <a href="https://github.com/EAguirreChama" target="_blank">
                     <div class="github-picture"></div>
                   </a>
-                  <a href="https://www.linkedin.com/in/aguirre-chama-ernesto-a9a090269/" target="_blank">
+                  <a href="https://www.linkedin.com/in/ernesto-aguirre-chama-a9a090269" target="_blank">
                     <div class="linkedin-picture"></div>
                   </a>
                 </div>
               </div>
             </div>
-           
-        </div>
-        <div class="border border-yellow-300 m-1 flex flex-col items-center md:flex-row rounded-2xl">
-          <div
-            class="border border-yellow-300 w-48 h-48 m-2 bg-white flex items-center justify-center rounded-full overflow-hidden">
 
-            <img src="../assets/img/johan.svg" alt="Johan" class="w-full h-full object-cover" />
           </div>
-          <div class="md:w-2/3 m-2 bg-black text-white">
+        </div>
+        <div class="border border-border m-1 flex flex-col items-center md:flex-row rounded-2xl">
+          <div class="flex flex-col justify-evenly items-center md:flex-row bg-container p-2 m-2 rounded-2xl">
+            <div
+              class="border border-border w-[200px] h-[200px] bg-white flex items-center justify-center rounded-full  overflow-hidden">
+              <img src="../assets/img/johan.svg" alt="Johan" class="w-full h-full object-cover" />
+            </div>
+            <div class="md:w-2/3 m-2 bg-container text-title">
               <div class="containerNombreImagen">
                 <h3 class="text-xl mt-2 font-bold text-center">
                   Johan Fabian Arciniegas Fajardo
                 </h3>
-                <p class="text-l mt-4 text-justify">
+                <p class="text-l m-3 text-justify">
                   Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel
                   soluta inventore, corrupti dolorum ab excepturi? Incidunt dolore
                   molestiae, necessitatibus, ipsum in odio veniam delectus at
@@ -109,18 +117,20 @@ onMounted(() => {
                 </div>
               </div>
             </div>
-        </div>
-        <div class="border border-yellow-300 m-1 flex flex-col items-center md:flex-row rounded-2xl">
-          <div
-            class="border border-yellow-300 w-48 h-48 m-2 bg-white flex items-center justify-center rounded-full overflow-hidden">
-            <img src="../assets/img/Lienan.svg" alt="Lienan" class="w-full h-full object-cover" />
           </div>
-          <div class="md:w-2/3 m-2 bg-black text-white">
+        </div>
+        <div class="border border-border m-1 flex flex-col items-center md:flex-row rounded-2xl">
+          <div class="flex flex-col justify-evenly items-center md:flex-row bg-container p-2 m-2 rounded-2xl">
+            <div
+              class="border border-border w-[200px] h-[200px] bg-white flex items-center justify-center rounded-full  overflow-hidden">
+              <img src="../assets/img/Lienan.svg" alt="Lienan" class="w-full h-full object-cover" />
+            </div>
+            <div class="md:w-2/3 m-2 bg-container text-title">
               <div class="containerNombreImagen">
                 <h3 class="text-xl mt-2 font-bold text-center">
                   Lienan Manuel Wisner
                 </h3>
-                <p class="text-l mt-4 text-justify">
+                <p class="text-l m-3 text-justify">
                   Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel
                   soluta inventore, corrupti dolorum ab excepturi? Incidunt dolore
                   molestiae, necessitatibus, ipsum in odio veniam delectus at
@@ -136,20 +146,22 @@ onMounted(() => {
                 </div>
               </div>
             </div>
+          </div>
         </div>
       </div>
       <div class="md:w-1/2 flex flex-col p-2 m-2">
-        <div class="border border-yellow-300 m-1 flex flex-col items-center md:flex-row rounded-2xl">
-          <div
-            class="border border-yellow-300 w-48 h-48 m-2 bg-white flex items-center justify-center rounded-full overflow-hidden">
-            <img src="../assets/img/icon.png" alt="Camilo" class="w-full h-full object-cover" />
-          </div>
-          <div class="md:w-2/3 m-2 bg-black text-white">
+        <div class="border border-border m-1 flex flex-col items-center md:flex-row rounded-2xl">
+          <div class="flex flex-col justify-evenly items-center md:flex-row bg-container p-2 m-2 rounded-2xl">
+            <div
+              class="border border-border w-[200px] h-[200px] bg-white flex items-center justify-center rounded-full  overflow-hidden">
+              <img src="../assets/img/camilo.svg" alt="Camilo" class="w-full h-full object-cover" />
+            </div>
+            <div class="md:w-2/3 m-2 bg-container text-title">
               <div class="containerNombreImagen">
                 <h3 class="text-xl mt-2 font-bold text-center">
                   Camilo Agudelo Betancur
                 </h3>
-                <p class="text-l mt-4 text-justify">
+                <p class="text-l m-3 text-justify">
                   Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel
                   soluta inventore, corrupti dolorum ab excepturi? Incidunt dolore
                   molestiae, necessitatibus, ipsum in odio veniam delectus at
@@ -165,18 +177,20 @@ onMounted(() => {
                 </div>
               </div>
             </div>
-        </div>
-        <div class="border border-yellow-300 m-1 flex flex-col items-center md:flex-row rounded-2xl">
-          <div
-            class="border border-yellow-300 w-48 h-48 m-2 bg-white flex items-center justify-center rounded-full overflow-hidden">
-            <img src="../assets/img/Jairo.svg" alt="Jairo" class="w-full h-full object-cover" />
           </div>
-          <div class="md:w-2/3 m-2 bg-black text-white">
+        </div>
+        <div class="border border-border m-1 flex flex-col items-center md:flex-row rounded-2xl">
+          <div class="flex flex-col justify-evenly items-center md:flex-row bg-container p-2 m-2 rounded-2xl">
+            <div
+              class="border border-border w-[200px] h-[200px] bg-white flex items-center justify-center rounded-full  overflow-hidden">
+              <img src="../assets/img/Jairo.svg" alt="Jairo" class="w-full h-full object-cover" />
+            </div>
+            <div class="md:w-2/3 m-2 bg-container text-title">
               <div class="containerNombreImagen">
                 <h3 class="text-xl mt-2 font-bold text-center">
                   Jairo David Holgado
                 </h3>
-                <p class="text-l mt-4 text-justify">
+                <p class="text-l m-3 text-justify">
                   Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel
                   soluta inventore, corrupti dolorum ab excepturi? Incidunt dolore
                   molestiae, necessitatibus, ipsum in odio veniam delectus at
@@ -192,19 +206,21 @@ onMounted(() => {
                 </div>
               </div>
             </div>
+          </div>
         </div>
 
-        <div class="border border-yellow-300 m-1 flex flex-col items-center md:flex-row rounded-2xl">
-          <div
-            class="border border-yellow-300 w-48 h-48 m-2 bg-white flex items-center justify-center rounded-full overflow-hidden">
-            <img src="../assets/img/jose.svg" alt="Jose" class="w-full h-full object-cover" />
-          </div>
-          <div class="md:w-2/3 m-2 bg-black text-white">
+        <div class="border border-border m-1 flex flex-col items-center md:flex-row rounded-2xl">
+          <div class="flex flex-col justify-evenly items-center md:flex-row bg-container p-2 m-2 rounded-2xl">
+            <div
+              class="border border-border w-[200px] h-[200px] bg-white flex items-center justify-center rounded-full  overflow-hidden">
+              <img src="../assets/img/jose.svg" alt="Jose" class="w-full h-full object-cover" />
+            </div>
+            <div class="md:w-2/3 m-2 bg-container text-title">
               <div class="containerNombreImagen">
                 <h3 class="text-xl mt-2 font-bold text-center">
                   Jose Antonio Lopez Rocha
                 </h3>
-                <p class="text-l mt-4 text-justify">
+                <p class="text-l m-3 text-justify">
                   Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel
                   soluta inventore, corrupti dolorum ab excepturi? Incidunt dolore
                   molestiae, necessitatibus, ipsum in odio veniam delectus at
@@ -220,18 +236,20 @@ onMounted(() => {
                 </div>
               </div>
             </div>
-        </div>
-        <div class="border border-yellow-300 m-1 flex flex-col items-center md:flex-row rounded-2xl">
-          <div
-            class="border border-yellow-300 w-48 h-48 m-2 bg-white flex items-center justify-center rounded-full overflow-hidden">
-            <img src="../assets/img/Nico.svg" alt="Nico" class="w-full h-full object-cover" />
           </div>
-          <div class="md:w-2/3 m-2 bg-black text-white">
+        </div>
+        <div class="border border-border m-1 flex flex-col items-center md:flex-row rounded-2xl">
+          <div class="flex flex-col justify-evenly items-center md:flex-row bg-container p-2 m-2 rounded-2xl">
+            <div
+              class="border border-border w-[200px] h-[200px] bg-white flex items-center justify-center rounded-full  overflow-hidden">
+              <img src="../assets/img/Nico.svg" alt="Nico" class="w-full h-full object-cover" />
+            </div>
+            <div class="md:w-2/3 m-2 bg-container text-title">
               <div class="containerNombreImagen">
                 <h3 class="text-xl mt-2 font-bold text-center">
                   Nicolas Dario Suarez
                 </h3>
-                <p class="text-l mt-4 text-justify">
+                <p class="text-l m-3 text-justify">
                   Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel
                   soluta inventore, corrupti dolorum ab excepturi? Incidunt dolore
                   molestiae, necessitatibus, ipsum in odio veniam delectus at
@@ -247,23 +265,29 @@ onMounted(() => {
                 </div>
               </div>
             </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
+  </div>
+  <FooterVue />
 </template>
 
+
 <style lang="scss" scoped>
-.--container-- {
-  position: relative;
-  z-index: 100000;
-  overflow-x: hidden;
+
+
+.ppal{
+  margin-top: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 @media (max-width: 768px) {
   .--container-- {
     position: relative;
-    z-index: 100000;
     flex-direction: column;
     align-items: center;
   }
@@ -273,47 +297,54 @@ onMounted(() => {
   .--container-- {
     flex-direction: column;
   }
-
-  .border {
-    flex-direction: column;
-  }
-
-  .border>div:first-child {
-    margin-bottom: 1rem;
-  }
 }
 
 .containerNombreImagen {
   display: flex;
   flex-direction: column;
-  align-items:center;
+  align-items: center;
+  height: min-content;
+  padding: 2px;
+  width: 100%;
+
 }
 
 .iconos {
   display: flex;
-  justify-content: center;
-  // margin-top: 10px;
+  flex-direction: row;
+  justify-content: space-evenly;
+  margin-top: 5px;
+  width: 70%;
+  align-items: center;
 }
 
 .github-picture {
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background-size: cover;
-  margin-top: 11px;
-  margin-right: 50px;
+  border: solid 1px var(--border);
 }
+
 .linkedin-picture {
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background-size: cover;
-  margin-top: 5px;
-  margin-left: 50px;
+  border: solid 1px var(--border);
 }
+
+.linkedin-picture:hover{
+  border: solid 1px var(--title);
+}
+.github-picture:hover{
+  border: solid 1px var(--title);
+}
+
 .github-picture {
   background-image: url('../assets/img/Logo\ GitHub.png');
 }
+
 .linkedin-picture {
   background-image: url('../assets/img/Logo\ Linkdin.png');
 }

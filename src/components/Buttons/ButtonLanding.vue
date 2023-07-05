@@ -17,7 +17,9 @@ button {
   text-shadow: 1px 1px 0.2rem #f8e007aa;
   transition: all .3s;
 }
-/*** ESTILOS BOTÓN SLIDE LEFT ***/
+
+
+/* ESTILOS BOTÓN SLIDE LEFT */
 .ov-btn-slide-left {
   position: absolute;
   bottom: -12rem;
