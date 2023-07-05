@@ -148,7 +148,7 @@ let checkImage = user.image
         <div class="flex flex-col md:flex-row mt-5 justify-evenly items-center">
           <button
             class="text-title text-lg mt-9 rounded-md p-2 tracking-wider font-bold cursor-pointer buttonUpload"
-            @click="openUploadWidget()"
+            @click="openUploadWidget"
           >
             Upload image <i class="fa-solid fa-cloud-arrow-up"></i>
           </button>
