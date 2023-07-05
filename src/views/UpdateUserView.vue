@@ -148,14 +148,14 @@ let checkImage = user.image
    
           <input
             type="submit"
-            class="text-black w-1/3 text-lg mt-2 rounded-md p-2 tracking-wider font-bold cursor-pointer buttonUpload"
+            class="text-black w-1/3 text-lg mt-2 rounded-md p-2 tracking-wider font-bold cursor-pointer "
             value="Update"
           />
       
       </FormKit>
       <div class="flex flex-col md:flex-row mt-5 justify-evenly items-center">
           <button
-            class="text-title text-lg mt-9 rounded-md p-2 tracking-wider font-bold cursor-pointer"
+            class="text-title text-lg mt-9 rounded-md p-2 tracking-wider font-bold cursor-pointer buttonUpload"
             @click="openUploadWidget"
           >
             Upload image
