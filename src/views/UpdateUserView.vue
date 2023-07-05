@@ -152,6 +152,13 @@ let checkImage = user.image
           >
             Upload image
           </button>
+          <input
+            type="submit"
+            class="text-black w-1/3 text-lg mt-2 rounded-md p-2 tracking-wider font-bold cursor-pointer buttonUpload"
+            value="Update"
+          />
+        </div>
+      </FormKit>
 
           <div v-if="uploadedImage">
             <img
@@ -196,13 +203,8 @@ let checkImage = user.image
         
             Cancel
           </button>
-          <input
-            type="submit"
-            class="text-black w-1/3 text-lg mt-2 rounded-md p-2 tracking-wider font-bold cursor-pointer"
-            value="Update"
-          />
-        </div>
-      </FormKit>
+        
+      
 
       <!-- La variable "uploadedImage" es la que tiene el id de la imagen que se busca en Cloudinary para mostrar, eso deberia ser lo que se mande en el form -->
     </div>
