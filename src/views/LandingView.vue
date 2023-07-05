@@ -39,7 +39,6 @@ updateClass();
       </div>
     </div>
   </div>
-  <FooterVue />
 
 </template>
 
