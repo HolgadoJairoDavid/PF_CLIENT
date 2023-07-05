@@ -145,21 +145,22 @@ let checkImage = user.image
           messages-class="text-red-600"
         />
 
-        <div class="flex flex-col md:flex-row mt-5 justify-evenly items-center">
+   
+          <input
+            type="submit"
+            class="text-black w-1/3 text-lg mt-2 rounded-md p-2 tracking-wider font-bold cursor-pointer buttonUpload"
+            value="Update"
+          />
+      
+      </FormKit>
+      <div class="flex flex-col md:flex-row mt-5 justify-evenly items-center">
           <button
             class="text-title text-lg mt-9 rounded-md p-2 tracking-wider font-bold cursor-pointer"
             @click="openUploadWidget"
           >
             Upload image
           </button>
-          <input
-            type="submit"
-            class="text-black w-1/3 text-lg mt-2 rounded-md p-2 tracking-wider font-bold cursor-pointer buttonUpload"
-            value="Update"
-          />
-        </div>
-      </FormKit>
-
+          
           <div v-if="uploadedImage">
             <img
               :src="user.image"
@@ -194,6 +195,8 @@ let checkImage = user.image
             />
           </div>
         </div>
+        </div>
+        
         <div class="flex flex-row justify-evenly mt-6">
           <button
             type="button"
