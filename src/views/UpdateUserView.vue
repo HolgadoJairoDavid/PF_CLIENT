@@ -150,7 +150,7 @@ let checkImage = user.image
             class="text-title text-lg mt-9 rounded-md p-2 tracking-wider font-bold cursor-pointer buttonUpload"
             @click="openUploadWidget"
           >
-            Upload image <i class="fa-solid fa-cloud-arrow-up"></i>
+            Upload image
           </button>
 
           <div v-if="uploadedImage">
