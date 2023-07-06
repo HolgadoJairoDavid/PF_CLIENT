@@ -36,7 +36,7 @@ const widget = window.cloudinary.createUploadWidget(
   (error, result) => {
     if (!error && result && result.event === "success") {
       uploadedImage.value = result.info.public_id;
-      user.image = uploadedImage;
+      user.value.image = uploadedImage;
       checkImage = 2;
     }
   }
@@ -49,7 +49,7 @@ let uploadedImage = ref(store.user.image);
 const handleSubmit = async (dataForm) => {
   dataForm.image = uploadedImage.value;
   try {
-    const { data } = await ClienteService.updateUserById(user._id, dataForm);
+    const { data } = await ClienteService.updateUserById(user.value._id, dataForm);
 
     store.updateProfile(data);
     router.push({ name: "profile" });
@@ -67,8 +67,8 @@ const redirectToProfile = () => {
   router.push({ name: "profile" });
 };
 
-let checkImage = user.image
-  ? user.image.split("/").length
+let checkImage = user.value.image
+  ? user.value.image.split("/").length
   : store.user.image.split("/").length;
 </script>
 <template>
