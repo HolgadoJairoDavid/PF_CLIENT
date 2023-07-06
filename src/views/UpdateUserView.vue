@@ -22,7 +22,9 @@ onMounted(async () => {
     router.push({ name: "login" });
     return;
   } else {
-    user = { ...store.user };
+
+    user.value = { ...store.user };
+
 
     const { data: countriesData } = await ClienteService.getAllCountries();
     countries.value = [...Helpers.beautifyCountries(countriesData)];
@@ -144,10 +146,19 @@ let checkImage = user.image
           input-class="pb-2 mt-7 bg-container border-b-2 border-border focus:outline-none w-[100%] focus:placeholder-transparent"
           messages-class="text-red-600"
         />
+        <input
+            type="submit"
+            class="text-black w-1/3 text-lg mt-2 rounded-md p-2 tracking-wider font-bold cursor-pointer"
+            value="Update"
+          />
+        </FormKit>
 
-        <div class="flex flex-col md:flex-row mt-5 justify-evenly items-center">
+
+
+        <div class="flex flex-row md:flex-row mt-5 justify-between items-center">
           <button
-            class="text-title text-lg mt-9 rounded-md p-2 tracking-wider font-bold cursor-pointer buttonUpload"
+            class="text-title md:text-lg text-md mt-9 mr-5 rounded-md p-2 tracking-wider font-bold cursor-pointer buttonUpload"
+
             @click="openUploadWidget()"
           >
             Upload image <i class="fa-solid fa-cloud-arrow-up"></i>
@@ -187,7 +198,9 @@ let checkImage = user.image
             />
           </div>
         </div>
-        <div class="flex flex-row justify-evenly mt-6">
+
+        <div class="flex flex-row justify-start w-[100%] mt-6">
+
           <button
             type="button"
             class="delete w-fit text-lg mt-2 p-2 px-3 bg-red-400 hover:bg-red-700 text-black text-center font-bold rounded-md"
@@ -196,13 +209,10 @@ let checkImage = user.image
         
             Cancel
           </button>
-          <input
-            type="submit"
-            class="text-black w-1/3 text-lg mt-2 rounded-md p-2 tracking-wider font-bold cursor-pointer"
-            value="Update"
-          />
+
+          
         </div>
-      </FormKit>
+
 
       <!-- La variable "uploadedImage" es la que tiene el id de la imagen que se busca en Cloudinary para mostrar, eso deberia ser lo que se mande en el form -->
     </div>

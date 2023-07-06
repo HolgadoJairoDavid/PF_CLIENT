@@ -37,7 +37,7 @@ onUnmounted(() => {
 });
 
 const openTwilio = () => {
-  const url = "https://henrymoon.vercel.app/videocall";
+  const url = "https://video-app-4541-6703-dev.twil.io/";
   window.open(url, "_blank");
 };
 
