@@ -12,7 +12,7 @@ import "vue3-toastify/dist/index.css";
 const store = useAccessStore();
 import socket from "./../lib/socket";
 import { onMounted } from "vue";
-import FooterVue from "../components/Footer.vue";
+
 import { ref } from "vue";
 const router = useRouter();
 
@@ -143,7 +143,7 @@ const handleSubmit = async (dataForm) => {
       <Authentication @change-loading="changeLoading"/>
     </div>
   </div>
-  <FooterVue/>
+ 
   <!-- <div v-if="loading" class="text-white absolute top-0 right-0 left-0 bottom-0 flex justify-center items-center loader">
     <p class="text-9xl">Loading...</p>
   </div> -->

@@ -15,7 +15,7 @@ const countries = ref([])
 import socket from "./../lib/socket";
 import { onMounted } from "vue";
 import Helpers from "../helpers";
-import FooterVue from "../components/Footer.vue";
+
 const widget = window.cloudinary.createUploadWidget(
   { cloud_name: "HenryMoon", upload_preset: "sm7kib26" },
   (error, result) => {
@@ -336,7 +336,7 @@ const redirectToLogin = () => {
       </span>
     </div>
   </div>
-  <FooterVue />
+  
 </template>
 
 <style lang="scss" scoped>
