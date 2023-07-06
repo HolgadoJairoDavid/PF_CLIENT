@@ -104,7 +104,7 @@ const setPages = () => {
             type="number" 
             name="donation" 
             placeholder="Enter Amount"
-            input-class="bg-body text-lg p-2 m-2 border-2 rounded-[5px] border-border focus:outline-none focus:placeholder-transparent text-center placeholder-white"
+            input-class="bg-body md:text-lg text-md p-2 mt-2 border-2 rounded-[5px] border-border focus:outline-none focus:placeholder-transparent text-center placeholder-white w-[100%]"
             placeholder-class="text-red-500 input:focus:placeholder-transparent" 
             validation="required | number"
             :validation-messages="{
