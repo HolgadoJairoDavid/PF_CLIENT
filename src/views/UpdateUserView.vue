@@ -145,22 +145,14 @@ let checkImage = user.image
           messages-class="text-red-600"
         />
 
-   
-          <input
-            type="submit"
-            class="text-black w-1/3 text-lg mt-2 rounded-md p-2 tracking-wider font-bold cursor-pointer "
-            value="Update"
-          />
-      
-      </FormKit>
-      <div class="flex flex-col md:flex-row mt-5 justify-evenly items-center">
+        <div class="flex flex-col md:flex-row mt-5 justify-evenly items-center">
           <button
             class="text-title text-lg mt-9 rounded-md p-2 tracking-wider font-bold cursor-pointer buttonUpload"
-            @click="openUploadWidget"
+            @click="openUploadWidget()"
           >
-            Upload image
+            Upload image <i class="fa-solid fa-cloud-arrow-up"></i>
           </button>
-          
+
           <div v-if="uploadedImage">
             <img
               :src="user.image"
@@ -195,8 +187,6 @@ let checkImage = user.image
             />
           </div>
         </div>
-        </div>
-        
         <div class="flex flex-row justify-evenly mt-6">
           <button
             type="button"
@@ -206,8 +196,13 @@ let checkImage = user.image
         
             Cancel
           </button>
-        
-      
+          <input
+            type="submit"
+            class="text-black w-1/3 text-lg mt-2 rounded-md p-2 tracking-wider font-bold cursor-pointer"
+            value="Update"
+          />
+        </div>
+      </FormKit>
 
       <!-- La variable "uploadedImage" es la que tiene el id de la imagen que se busca en Cloudinary para mostrar, eso deberia ser lo que se mande en el form -->
     </div>

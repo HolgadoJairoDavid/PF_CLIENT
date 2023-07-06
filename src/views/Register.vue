@@ -336,6 +336,7 @@ const redirectToLogin = () => {
       </span>
     </div>
   </div>
+  <FooterVue />
 </template>
 
 <style lang="scss" scoped>
