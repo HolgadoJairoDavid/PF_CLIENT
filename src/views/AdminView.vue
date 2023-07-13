@@ -259,11 +259,11 @@ const handleUser = (id) => {
       </div>
 
       <div class="container3">
-        <div class="w-1/2">
+        <div class="w-1/4">
           <h1 class="title">Students</h1>
           <SearchBar class="search" @handle-search="handleSearch" :emailProp="email" />
         </div>
-        <div class="paginado">
+        <div class="paginado w-3/4">
           <button
             v-if="pages.length > 1"
             type="button"
@@ -489,7 +489,7 @@ const handleUser = (id) => {
     border: 1px solid var(--border);
   }
   .paginado {
-    width: 50%;
+    // width: 50%;
     display: flex; 
     justify-content: center;
     align-items: center;
