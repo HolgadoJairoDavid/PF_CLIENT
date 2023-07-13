@@ -493,7 +493,7 @@ const handleUser = (id) => {
     display: flex; 
     justify-content: center;
     align-items: center;
-    gap: 1rem;
+    gap: .8rem;
     padding: 5px;
   }
   // .number {
